@@ -137,10 +137,13 @@
 </div>
     </script>
     <script>
-        var editor;
+        JSONEditor.defaults.editors.object.options.collapsed = true;
+        JSONEditor.defaults.editors.object.options.remove_empty_properties = false;
+        var editor = null;
         var fileChanged = false;
         var filename = null;
         var loading = false;
+        var schema;
         $('#changed-no').click(function() {
             $('#changed').modal('hide');
         });
@@ -191,6 +194,20 @@
             processData: false,
             method: 'PUT'});
         }
+        function neweditor() {
+            if (editor !== null) {
+                editor.destroy();
+            }
+            editor = new JSONEditor(document.getElementById('editor_holder'), {
+                    schema: schema,
+                    theme: 'bootstrap3',
+                    iconlib: 'bootstrap3',
+                    no_additional_properties: true
+                    });
+            loading = true;
+            editor.on('change', somethingChanged);
+            fileChanged = false;
+        }
 
         $('#overwrite-yes').click(function() {
             storeFile();
@@ -232,20 +249,11 @@
         });
 
         $.get('../schema_v2.json', function(data) {
-            var element = document.getElementById('editor_holder');
-            editor = new JSONEditor(element, {
-                    schema: data,
-                    theme: 'bootstrap3',
-                    iconlib: 'bootstrap3',
-                    });
-            loading = true;
-            editor.on('change', somethingChanged);
-            fileChanged = false;
+            schema = data;
+            neweditor();
         });
         function fileNew() {
-            loading = true;
-            editor.setValue({});
-            fileChanged = false;
+            neweditor();
             setFilename(null);
         }
         $('#file-new').click(function() {
