@@ -9,7 +9,7 @@
     <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
-            padding-top: 50px;
+            padding-top: 70px;
         }
     </style>
   </head>
@@ -120,10 +120,18 @@
     </div>
     
     <div class="container" role="main">
-        <div class="row">
-            <div id="editor_holder"></div>
+        <ul class="nav nav-tabs" role="tablist">
+            <li role="presentation" class="active"><a href="#gui" aria-controls="gui" role="tab" data-toggle="tab">GUI</a></li>
+            <li role="presentation"><a href="#raw" aria-controls="raw" role="tab" data-toggle="tab">Raw</a></li>
+        </ul>
+        <div class="tab-content">
+            <div role="tabpanel" class="tab-pane active" id="gui">
+                <p><div id="editor_holder"></div></p>
+            </div>
+            <div role="tabpanel" class="tab-pane" id="raw">
+                <p><textarea id="rawjson" class="form-control" rows="25"></textarea></p>
+            </div>
         </div>
-
     </div>
 
     <script src="jquery.min.js"></script>
@@ -215,6 +223,7 @@
             loading = true;
             editor.on('change', somethingChanged);
             noChange();
+            $('#rawjson').val(JSON.stringify(editor.getValue(), null, 2));
         }
 
         $('#overwrite-yes').click(function() {
@@ -296,6 +305,15 @@
         }
         $('#file-open').click(function() {
             canChange(fileOpen);
+        });
+        $('a[href="#raw"]').on('show.bs.tab', function () {
+            $('#rawjson').val(JSON.stringify(editor.getValue(), null, 2));
+        });
+        $('a[href="#gui"]').on('show.bs.tab', function () {
+            editor.setValue(JSON.parse($('#rawjson').val()));
+        });
+        $('#rawjson').bind('input propertychange', function() {
+            somethingChanged();
         });
     </script>
   </body>
