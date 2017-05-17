@@ -32,7 +32,7 @@
             <li class="disabled" id="file-save-li" role="button"><a id="file-save"><span class="glyphicon glyphicon-floppy-disk"></span> Save</a></li>
             <li><a id="file-save-as" role="button"><span class="glyphicon glyphicon-floppy-save"></span> Save as...</a></li>
           </ul>
-          <p class="navbar-text navbar-right" id="filename">Currently editing unnamed file</p>
+          <p class="navbar-text navbar-right" id="filename">Currently editing unnamed file <span class="label label-danger hidden" id="filechanged">modified</span></p>
         </div>
       </div>
     </nav>
@@ -166,6 +166,11 @@
                 return;
             }
             fileChanged = true;
+            $('#filechanged').removeClass("hidden");
+        }
+        function noChange() {
+            fileChanged = false;
+            $('#filechanged').addClass("hidden");
         }
 
         function setFilename(file) {
@@ -191,25 +196,25 @@
                     $('#overwrite').modal('hide');
                     $('#working').modal('hide');
                     $('#file-save-dialog').modal('hide');
-                    fileChanged = false;
+                    noChange();
                 },
             data: JSON.stringify(editor.getValue(), null, 2),
             processData: false,
             method: 'PUT'});
         }
-        function neweditor() {
+        function neweditor(data) {
             if (editor !== null) {
                 editor.destroy();
             }
             editor = new JSONEditor(document.getElementById('editor_holder'), {
+                    startval: data,
                     schema: schema,
                     theme: 'bootstrap3',
                     iconlib: 'bootstrap3',
-                    no_additional_properties: true
                     });
             loading = true;
             editor.on('change', somethingChanged);
-            fileChanged = false;
+            noChange();
         }
 
         $('#overwrite-yes').click(function() {
@@ -280,10 +285,10 @@
                         setFilename($(this).text());
                         $.get('/'+filename, function(data) {
                             loading = true;
-                            editor.setValue(data);
+                            neweditor(data);
                             $('#working').modal('hide');
                             $('#file-open-dialog').modal('hide');
-                            fileChanged = false;
+                            noChange();
                         });
                     });
                     $('#file-open-dialog').modal();
