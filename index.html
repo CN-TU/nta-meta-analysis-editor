@@ -32,6 +32,7 @@
             <li class="disabled" id="file-save-li" role="button"><a id="file-save"><span class="glyphicon glyphicon-floppy-disk"></span> Save</a></li>
             <li><a id="file-save-as" role="button"><span class="glyphicon glyphicon-floppy-save"></span> Save as...</a></li>
           </ul>
+          <p class="navbar-text navbar-right" id="filename">Currently editing unnamed file</p>
         </div>
       </div>
     </nav>
@@ -171,8 +172,10 @@
             filename = file;
             if (file == null) {
                 $('#file-save-li').addClass("disabled");
+                $('#filename').html("Currently editing unnamed file");
             } else {
                 $('#file-save-li').removeClass("disabled");
+                $('#filename').html("Currently editing <mark>"+filename.substring(0,filename.lastIndexOf(".")).split("/").slice(-2).join("/")+"</mark>");
             }
         }
 
