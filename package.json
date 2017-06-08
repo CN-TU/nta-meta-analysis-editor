@@ -1,0 +1,10 @@
+{
+  "name": "paper-editor",
+  "version": "0.9.0",
+  "main": "main.js",
+  "dependencies": {
+    "bootstrap": "^3.3.7",
+    "jquery": "^3.2.1",
+    "json-editor": "github:notti/json-editor"
+  }
+}

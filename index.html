@@ -6,7 +6,7 @@
     <title>Paper editor</title>
 
     <!-- Bootstrap -->
-    <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="node_modules/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
             padding-top: 70px;
@@ -16,65 +16,21 @@
   <body>
   <nav class="navbar navbar-fixed-top navbar-default">
       <div class="container">
-        <div class="navbar-header">
-          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-            <span class="sr-only">Toggle navigation</span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </button>
-          <span class="navbar-brand">Super awesome Paper Editor</span>
-        </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
-            <li><a id="file-new" role="button"><span class="glyphicon glyphicon-file"></span> New</a></li>
-            <li><a id="file-open" role="button"><span class="glyphicon glyphicon-folder-open"></span> Open</a></li>
-            <li class="disabled" id="file-save-li" role="button"><a id="file-save"><span class="glyphicon glyphicon-floppy-disk"></span> Save</a></li>
-            <li><a id="file-save-as" role="button"><span class="glyphicon glyphicon-floppy-save"></span> Save as...</a></li>
+            <div class="btn-toolbar" role="toolbar">
+                <button id="file-new" class="btn btn-default navbar-btn"><span class="glyphicon glyphicon-file"></span> New</button>
+                <button id="file-open" class="btn btn-default navbar-btn"><span class="glyphicon glyphicon-folder-open"></span> Open</button>
+                <button id="file-save" class="btn btn-default navbar-btn"><span class="glyphicon glyphicon-floppy-disk"></span> Save</button>
+                <button id="file-save-as" class="btn btn-default navbar-btn"><span class="glyphicon glyphicon-floppy-save"></span> Save as...</button>
+            </div>
           </ul>
           <p class="navbar-text navbar-right">Currently editing <span id="filename">unnamed file</span> <span class="label label-danger hidden" id="filechanged">modified</span></p>
         </div>
       </div>
     </nav>
 
-    <div class="modal" id="file-open-dialog" tabindex="-1" role="dialog" aria-labelledby="fileopen">
-        <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title">File open</h4>
-                </div>
-                <div class="modal-body" id="file-open-list">
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="modal" id="file-save-dialog" tabindex="-1" role="dialog" aria-labelledby="fileopen">
-        <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title">File save...</h4>
-                </div>
-                <div class="modal-body">
-                    <form id="save-as-form">
-                        <div class="form-group" id="year-group">
-                            <label class="control-label" for="file-year">4-digit year</label>
-                            <input type="text" class="form-control" id="file-year" placeholder="2000" required>
-                            <span class="help-block">Publication year as 4 digit number.</span>
-                        </div>
-                        <div class="form-group" id="name-group">
-                            <label class="control-label" for="file-name">Filename</label>
-                            <input type="text" class="form-control" id="file-name" placeholder="author_title" required>
-                            <span class="help-block">Last name of first author and first (+second) word of title separated by underscore, without json ending (e.g. author_title).</span>
-                        </div>
-                        <button type="submit" class="btn btn-default">Save</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="modal" id="working" tabindex="-1" role="dialog" aria-labelledby="fileopen">
+    <div class="modal" id="working" tabindex="-1" role="dialog" aria-labelledby="Working...">
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -86,34 +42,6 @@
                             <span class="sr-only">Working...</span>
                         </div>
                     </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="modal" id="overwrite" tabindex="-1" role="dialog" aria-labelledby="fileopen">
-        <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h4 class="modal-title">File exists</h4>
-                </div>
-                <div class="modal-body">
-                    <p>File already exists. Overwrite?</p>
-                    <button type="button" class="btn btn-primary" id="overwrite-yes">Yes</button>
-                    <button type="button" class="btn btn-default" id="overwrite-no">No</button>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="modal" id="changed" tabindex="-1" role="dialog" aria-labelledby="fileopen">
-        <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h4 class="modal-title">File changed</h4>
-                </div>
-                <div class="modal-body">
-                    <p>The opened file changed. If you continue, you will loose this changes.</p>
-                    <button type="button" class="btn btn-primary" id="changed-yes">Continue and loose changes</button>
-                    <button type="button" class="btn btn-default" id="changed-no">Cancel</button>
                 </div>
             </div>
         </div>
@@ -134,40 +62,24 @@
         </div>
     </div>
 
-    <script src="jquery.min.js"></script>
-    <script src="bootstrap/js/bootstrap.min.js"></script>
-    <script src="jsoneditor.js"></script>
-    <script src="mustache.min.js"></script>
-    <script id="file-list-template" type="x-tmpl-mustache">
-<div class="list-group">
-{{#files}}
-<a class="list-group-item file-list-file" role="button">{{.}}</a>
-{{/files}}
-</div>
-    </script>
+    <script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
+    <script src="node_modules/jquery/dist/jquery.min.js"></script>
+    <script src="node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script src="node_modules/json-editor/dist/jsoneditor.min.js"></script>
+    <script>if (window.module) module = window.module;</script>
     <script>
-        JSONEditor.defaults.editors.object.options.collapsed = true;
-        JSONEditor.defaults.editors.object.options.remove_empty_properties = false;
-        var editor = null;
-        var fileChanged = false;
-        var filename = null;
+        const fs = require('fs')
+        const dialog = require('electron').remote.dialog
+
+        JSONEditor.defaults.editors.object.options.collapsed = true
+        JSONEditor.defaults.editors.object.options.remove_empty_properties = false
+
+        var fileChanged = false
         var loading = false;
-        var schema;
-        $('#changed-no').click(function() {
-            $('#changed').modal('hide');
-        });
-        function canChange(fun) {
-            if(fileChanged) {
-                $('#changed-yes').on('click', function(){
-                    $('#changed-yes').off('click');
-                    $('#changed').modal('hide');
-                    fun();
-                });
-                $('#changed').modal();
-            } else {
-                fun();
-            }
-        }
+        var filename = null
+        var schema = JSON.parse(fs.readFileSync('schema_v2.json', 'utf8'))
+        var editor = null
+
         function somethingChanged() {
             if (loading) {
                 loading = false;
@@ -179,36 +91,6 @@
         function noChange() {
             fileChanged = false;
             $('#filechanged').addClass("hidden");
-        }
-
-        function setFilename(file) {
-            filename = file;
-            if (file == null) {
-                $('#file-save-li').addClass("disabled");
-                $('#filename').html("unnamed file");
-            } else {
-                $('#file-save-li').removeClass("disabled");
-                $('#filename').html("<mark>"+filename.substring(0,filename.lastIndexOf(".")).split("/").slice(-2).join("/")+"</mark>");
-            }
-        }
-
-        function storeFile() {
-            if (filename == null) {
-                return;
-            }
-            $('#working').modal();
-            $.ajax('/' + filename, {
-                complete: function() {
-                    $('#file-year').val('');
-                    $('#file-name').val('');
-                    $('#overwrite').modal('hide');
-                    $('#working').modal('hide');
-                    $('#file-save-dialog').modal('hide');
-                    noChange();
-                },
-            data: JSON.stringify(editor.getValue(), null, 2),
-            processData: false,
-            method: 'PUT'});
         }
         function neweditor(data) {
             if (editor !== null) {
@@ -225,87 +107,97 @@
             noChange();
             $('#rawjson').val(JSON.stringify(editor.getValue(), null, 2));
         }
-
-        $('#overwrite-yes').click(function() {
-            storeFile();
-        });
-        $('#overwrite-no').click(function() {
-            $('#overwrite').modal('hide');
-        });
-        
-        $('#save-as-form').submit(function(event) {
-            event.preventDefault();
-            $('#year-group').removeClass('has-error')
-            $('#name-group').removeClass('has-error')
-            ok = true;
-            var yearRe = new RegExp('^\\d{4}$');
-            year = $('#file-year').val();
-            if (!yearRe.test(year)) {
-                $('#year-group').addClass('has-error')
-                ok = false;
+        function setFilename(file) {
+            filename = file;
+            if (file == null) {
+                $('#filename').html("unnamed file");
+            } else {
+                $('#filename').html("<mark>"+filename.split("/").slice(-2).join("/")+"</mark>");
             }
-            var nameRe = new RegExp('^.+_.+$');
-            name = $('#file-name').val();
-            if (!nameRe.test(name) || name.indexOf(".json", name.length - ".json".length) !== -1) {
-                $('#name-group').addClass('has-error')
-                ok = false;
-            }
-            if (!ok) {
-                return;
-            }
-            setFilename('data/v2_papers/' + year + '/'+ name + '.json');
-            $.get('/list_papers', function(data) {
-                for(i=0; i<data.length; i++) {
-                    if (filename == data[i]) {
-                        $('#overwrite').modal();
-                        return;
-                    }
-                }
-                storeFile();
-            });
-        });
-
-        $.get('../schema_v2.json', function(data) {
-            schema = data;
-            neweditor();
-        });
+        }
         function fileNew() {
             neweditor();
             setFilename(null);
         }
+        function canChange(fun) {
+            if(fileChanged) {
+                result = dialog.showMessageBox({
+                        "type": "warning",
+                        "title": "Unsaved changes",
+                        "message": "You have unsaved changes, which will be lost if you continue. Do you want to continue?",
+                        "buttons": ["Yes", "Cancel"],
+                        "defaultId": 1,
+                        "cancelId": 1
+                })
+                if (result == 0) {
+                    fun();
+                }
+            } else {
+                fun();
+            }
+        }
+        function working(fun) {
+            $('#working').modal();
+            setTimeout(function(){
+                fun()
+                $('#working').modal('hide');
+            }, 10);
+        }
+        function fileOpen() {
+            files = dialog.showOpenDialog({
+                    "title": "Open paper",
+                    "filters": [
+                        {name: 'JSON', extensions: ['json']}
+                    ],
+                    "properties": ["openFile"]})
+            if (files !== undefined) {
+                working(function() {
+                    setFilename(files[0])
+                    neweditor(JSON.parse(fs.readFileSync(files[0], 'utf8'))) //errorhandling!
+                    noChange()
+                })
+            }
+        }
+        function fileSave() {
+            if (filename == null) {
+                return;
+            }
+            working(function() {
+                fs.writeFileSync(filename, JSON.stringify(editor.getValue(), null, 2), {
+                    "encoding": "utf8"
+                })
+                noChange()
+            })
+        }
+        function fileSaveAs() {
+            file = dialog.showSaveDialog({
+                    "title": "Save paper as",
+                    "filters": [
+                        {name: 'JSON', extensions: ['json']}
+                    ]})
+            if (file !== undefined) {
+                setFilename(file)
+                fileSave()
+            }
+        }
+
         $('#file-new').click(function() {
             canChange(fileNew);
         });
-        $('#file-save').click(function() {
-            storeFile();
-        });
-        $('#file-save-as').click(function() {
-            $('#file-save-dialog').modal();
-        });
-        function fileOpen() {
-            $.get('/list_papers', function(data) {
-                    var template = $('#file-list-template').html();
-                    Mustache.parse(template);
-                    var rendered = Mustache.render(template, {'files': data});
-                    $('#file-open-list').html(rendered);
-                    $('.file-list-file').on('click', function() {
-                        $('#working').modal({
-                            keyboard: false });
-                        setFilename($(this).text());
-                        $.get('/'+filename, function(data) {
-                            loading = true;
-                            neweditor(data);
-                            $('#working').modal('hide');
-                            $('#file-open-dialog').modal('hide');
-                            noChange();
-                        });
-                    });
-                    $('#file-open-dialog').modal();
-            });
-        }
         $('#file-open').click(function() {
             canChange(fileOpen);
         });
+        $('#file-save').click(function() {
+            if (filename == null) {
+                fileSaveAs();
+            } else {
+                fileSave();
+            }
+        });
+        $('#file-save-as').click(function() {
+            fileSaveAs();
+        });
+
         $('a[href="#raw"]').on('show.bs.tab', function () {
             $('#rawjson').val(JSON.stringify(editor.getValue(), null, 2));
         });
@@ -315,6 +207,8 @@
         $('#rawjson').bind('input propertychange', function() {
             somethingChanged();
         });
+
+        fileNew()
     </script>
   </body>
 </html>
