@@ -69,6 +69,7 @@
     <script>if (window.module) module = window.module;</script>
     <script>
         const fs = require('fs')
+        const path = require('path')
         const dialog = require('electron').remote.dialog
 
         JSONEditor.defaults.editors.object.options.collapsed = true
@@ -77,7 +78,7 @@
         var fileChanged = false
         var loading = false;
         var filename = null
-        var schema = JSON.parse(fs.readFileSync('schema_v2.json', 'utf8'))
+        var schema = JSON.parse(fs.readFileSync(path.join(__dirname, 'schema_v2.json'), 'utf8'))
         var editor = null
 
         function somethingChanged() {
@@ -112,7 +113,7 @@
             if (file == null) {
                 $('#filename').html("unnamed file");
             } else {
-                $('#filename').html("<mark>"+filename.split("/").slice(-2).join("/")+"</mark>");
+                $('#filename').html("<mark>"+filename.split(path.sep).slice(-2).join(path.sep)+"</mark>");
             }
         }
         function fileNew() {
