@@ -71,6 +71,7 @@
         const fs = require('fs')
         const path = require('path')
         const dialog = require('electron').remote.dialog
+        const {ipcRenderer} = require('electron')
 
         JSONEditor.defaults.editors.object.options.collapsed = true
         JSONEditor.defaults.editors.object.options.remove_empty_properties = false
@@ -182,12 +183,25 @@
             }
         }
 
+        ipcRenderer.on('new', () => {
+            canChange(fileNew);
+        })
         $('#file-new').click(() => {
             canChange(fileNew);
         });
+        ipcRenderer.on('open', () => {
+            canChange(fileOpen);
+        })
         $('#file-open').click(() => {
             canChange(fileOpen);
         });
+        ipcRenderer.on('save', () => {
+            if (filename == null) {
+                fileSaveAs();
+            } else {
+                fileSave();
+            }
+        })
         $('#file-save').click(() => {
             if (filename == null) {
                 fileSaveAs();
@@ -198,6 +212,9 @@
         $('#file-save-as').click(() => {
             fileSaveAs();
         });
+        ipcRenderer.on('save-as', () => {
+            fileSaveAs();
+        })
 
         $('a[href="#raw"]').on('show.bs.tab', () => {
             $('#rawjson').val(JSON.stringify(editor.getValue(), null, 2));
