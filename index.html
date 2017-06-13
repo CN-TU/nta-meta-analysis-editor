@@ -139,7 +139,7 @@
         }
         function working(fun) {
             $('#working').modal();
-            setTimeout(function(){
+            setTimeout(() => {
                 fun()
                 $('#working').modal('hide');
             }, 10);
@@ -152,7 +152,7 @@
                     ],
                     "properties": ["openFile"]})
             if (files !== undefined) {
-                working(function() {
+                working(() => {
                     setFilename(files[0])
                     neweditor(JSON.parse(fs.readFileSync(files[0], 'utf8'))) //errorhandling!
                     noChange()
@@ -163,7 +163,7 @@
             if (filename == null) {
                 return;
             }
-            working(function() {
+            working(() => {
                 fs.writeFileSync(filename, JSON.stringify(editor.getValue(), null, 2), {
                     "encoding": "utf8"
                 })
@@ -182,30 +182,30 @@
             }
         }
 
-        $('#file-new').click(function() {
+        $('#file-new').click(() => {
             canChange(fileNew);
         });
-        $('#file-open').click(function() {
+        $('#file-open').click(() => {
             canChange(fileOpen);
         });
-        $('#file-save').click(function() {
+        $('#file-save').click(() => {
             if (filename == null) {
                 fileSaveAs();
             } else {
                 fileSave();
             }
         });
-        $('#file-save-as').click(function() {
+        $('#file-save-as').click(() => {
             fileSaveAs();
         });
 
-        $('a[href="#raw"]').on('show.bs.tab', function () {
+        $('a[href="#raw"]').on('show.bs.tab', () => {
             $('#rawjson').val(JSON.stringify(editor.getValue(), null, 2));
         });
-        $('a[href="#gui"]').on('show.bs.tab', function () {
+        $('a[href="#gui"]').on('show.bs.tab', () => {
             editor.setValue(JSON.parse($('#rawjson').val()));
         });
-        $('#rawjson').bind('input propertychange', function() {
+        $('#rawjson').bind('input propertychange', () => {
             somethingChanged();
         });
 
