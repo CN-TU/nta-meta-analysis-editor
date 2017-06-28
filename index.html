@@ -113,30 +113,14 @@
             filename = file;
             if (file == null) {
                 $('#filename').html("unnamed file");
+                document.title = "Paper editor - No File";
             } else {
                 $('#filename').html("<mark>"+filename.split(path.sep).slice(-2).join(path.sep)+"</mark>");
+                document.title = "Paper editor - editing "+filename.split(path.sep).slice(-2).join(path.sep);
             }
         }
         function fileNew() {
-            neweditor();
-            setFilename(null);
-        }
-        function canChange(fun) {
-            if(fileChanged) {
-                result = dialog.showMessageBox({
-                        "type": "warning",
-                        "title": "Unsaved changes",
-                        "message": "You have unsaved changes, which will be lost if you continue. Do you want to continue?",
-                        "buttons": ["Yes", "Cancel"],
-                        "defaultId": 1,
-                        "cancelId": 1
-                })
-                if (result == 0) {
-                    fun();
-                }
-            } else {
-                fun();
-            }
+            ipcRenderer.send("fileNew")
         }
         function working(fun) {
             $('#working').modal();
@@ -153,11 +137,15 @@
                     ],
                     "properties": ["openFile"]})
             if (files !== undefined) {
-                working(() => {
-                    setFilename(files[0])
-                    neweditor(JSON.parse(fs.readFileSync(files[0], 'utf8'))) //errorhandling!
-                    noChange()
-                })
+                if ((filename === null) && !fileChanged) {
+                    working(() => {
+                        setFilename(files[0])
+                        neweditor(JSON.parse(fs.readFileSync(files[0], 'utf8'))) //errorhandling!
+                        noChange()
+                    })
+                } else {
+                    ipcRenderer.send("fileOpen", files[0])
+                }
             }
         }
         function fileSave() {
@@ -183,18 +171,25 @@
             }
         }
 
-        ipcRenderer.on('new', () => {
-            canChange(fileNew);
-        })
-        $('#file-new').click(() => {
-            canChange(fileNew);
-        });
-        ipcRenderer.on('open', () => {
-            canChange(fileOpen);
-        })
-        $('#file-open').click(() => {
-            canChange(fileOpen);
-        });
+        window.onbeforeunload = (e) => {
+            if(fileChanged) {
+                result = dialog.showMessageBox({
+                        "type": "warning",
+                        "title": "Unsaved changes",
+                        "message": "You have unsaved changes, which will be lost if you close the window. Do you still want to close it?",
+                        "buttons": ["Yes", "Cancel"],
+                        "defaultId": 1,
+                        "cancelId": 1
+                })
+                if (result != 0) {
+                    e.returnValue = true
+                }
+            }
+        }
+        ipcRenderer.on('new', fileNew)
+        $('#file-new').click(fileNew)
+        ipcRenderer.on('open', fileOpen)
+        $('#file-open').click(fileOpen)
         ipcRenderer.on('save', () => {
             if (filename == null) {
                 fileSaveAs();
@@ -209,12 +204,8 @@
                 fileSave();
             }
         });
-        $('#file-save-as').click(() => {
-            fileSaveAs();
-        });
-        ipcRenderer.on('save-as', () => {
-            fileSaveAs();
-        })
+        $('#file-save-as').click(fileSaveAs);
+        ipcRenderer.on('save-as', fileSaveAs);
 
         $('a[href="#raw"]').on('show.bs.tab', () => {
             $('#rawjson').val(JSON.stringify(editor.getValue(), null, 2));
@@ -226,7 +217,17 @@
             somethingChanged();
         });
 
-        fileNew()
+        if (window.location.search != "") {
+            filename = window.location.search.substr(1)
+            working(() => {
+                setFilename(filename)
+                neweditor(JSON.parse(fs.readFileSync(filename, 'utf8'))) //errorhandling!
+                noChange()
+            })
+        } else {
+            neweditor();
+            setFilename(null);
+        }
     </script>
   </body>
 </html>

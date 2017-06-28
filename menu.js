@@ -33,7 +33,17 @@ const template = [
             click (item, focusedWindow) {
               if (focusedWindow) focusedWindow.webContents.send('save-as')
             }
-        }
+        },
+        {
+          type: 'separator'
+        },
+        {
+            label: 'Quit',
+            accelerator: 'CommandOrControl+Q',
+            click (item, focusedWindow) {
+              app.quit()
+            }
+        },
     ]
   },
   {

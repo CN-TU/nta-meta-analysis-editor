@@ -4,23 +4,27 @@ const url = require('url')
 const https = require('https')
 const fs = require('fs')
 
-let win
 
 const PROJECT = "dcferreira/nta-meta-analysis"
 const API_URL = "https://api.github.com/repos/"
 const DL_URL = "https://raw.githubusercontent.com/"
 
-function createWindow () {
+var windows = {}
+
+function createWindow (filename) {
     win = new BrowserWindow()
+    const id = win.id
+    windows[id] = win
 
     win.loadURL(url.format({
-        pathname: path.join(__dirname, 'index.html'),
+        pathname: path.join(__dirname, "index.html"),
         protocol: 'file:',
-        slashes: true
+        slashes: true,
+        search: filename
     }))
 
     win.on('closed', () => {
-            win = null
+        delete windows[id]
     })
 }
 
@@ -95,6 +99,14 @@ app.on('ready', () => {
     checkUpdate()
 })
 
+ipcMain.on('fileNew', () => {
+    createWindow()
+})
+
+ipcMain.on('fileOpen', (event, arg) => {
+    createWindow(arg)
+})
+
 app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') {
         app.quit()
@@ -102,7 +114,7 @@ app.on('window-all-closed', () => {
 })
 
 app.on('activate', () => {
-    if (win === null) {
+    if (Object.keys(windows).length === 0) {
         createWindow()
     }
 })
