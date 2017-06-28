@@ -36,7 +36,7 @@
     "electron-builder": "^18.6.2"
   },
   "scripts": {
-    "start": "electron .",
+    "start": "git log -n 1 --format='%H' ../schema_v2.json > commit.txt && electron .",
     "dist": "git log -n 1 --format='%H' ../schema_v2.json > commit.txt && build --mac --win --linux --x64"
   }
 }
