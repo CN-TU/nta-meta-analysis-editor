@@ -5,7 +5,7 @@ const https = require('https')
 const fs = require('fs')
 
 
-const PROJECT = "dcferreira/nta-meta-analysis"
+const PROJECT = "CN-TU/nta-meta-analysis"
 const API_URL = "https://api.github.com/repos/"
 const DL_URL = "https://raw.githubusercontent.com/"
 
