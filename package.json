@@ -1,6 +1,6 @@
 {
   "name": "paper-editor",
-  "version": "0.9.1",
+  "version": "0.9.3",
   "main": "main.js",
   "author": {
     "name": "Gernot Vormayr",
@@ -37,6 +37,6 @@
   },
   "scripts": {
     "start": "git log -n 1 --format='%H' ../schema_v2.json > commit.txt && electron .",
-    "dist": "git log -n 1 --format='%H' ../schema_v2.json > commit.txt && build --mac --win --linux --x64"
+    "dist": "git log -n 1 --format='%H' public -- ../../schema_v2.json > commit.txt && build --mac --win --linux --x64"
   }
 }

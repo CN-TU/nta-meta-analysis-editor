@@ -87,7 +87,7 @@ function checkUpdate() {
 
 app.on('ready', () => {
     cfgpath = app.getPath('appData') //use subpath
-    if (!fs.existsSync(path.join(cfgpath, 'schema_v2.json'))) {
+    if (!fs.existsSync(path.join(cfgpath, 'schema_v2.json')) || !fs.existsSync(path.join(cfgpath, 'commit.txt'))) {
         copy(path.join(__dirname, 'schema_v2.json'), path.join(cfgpath, 'schema_v2.json'))
         copy(path.join(__dirname, 'commit.txt'), path.join(cfgpath, 'commit.txt'))
     }
