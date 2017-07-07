@@ -71,13 +71,19 @@ function updateAvailable(sha) {
 }
 
 function checkUpdate() {
-    req = net.request(API_URL + PROJECT + "/commits?path=schema_v2.json&sha="+fs.readFileSync('commit.txt', 'utf8').trim())
+    req = net.request(API_URL + PROJECT + "/commits?path=schema_v2.json")
     req.on('response', (response) => {
         if (response.statusCode == 200) {
+            var data = ''
             response.on('data', (chunk) => {
-                chunk = JSON.parse(chunk)
-                if (chunk.length > 1) {
-                    updateAvailable(chunk[chunk.length -1].sha)
+                data += chunk
+            })
+            response.on('end', () => {
+                data = JSON.parse(data)
+                if (data.length > 1) {
+                    if (data[0].sha != fs.readFileSync(path.join(cfgpath, 'commit.txt'), 'utf8').trim()) {
+                        updateAvailable(data[0].sha)
+                    }
                 }
             })
         }
