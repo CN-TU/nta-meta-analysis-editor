@@ -83,6 +83,7 @@
         const path = require('path')
         const dialog = require('electron').remote.dialog
         const {ipcRenderer} = require('electron')
+        const {remote} = require('electron')
 
         JSONEditor.defaults.options.show_errors = 'always'
         JSONEditor.defaults.editors.object.options.collapsed = true
@@ -183,20 +184,27 @@
             }
         }
 
+        let closeWindow = false
+
         window.onbeforeunload = (e) => {
-            if(fileChanged) {
+            if (closeWindow) return
+            if (!fileChanged) return
+            e.returnValue = false
+
+            setTimeout(() => {
                 result = dialog.showMessageBox({
                         "type": "warning",
                         "title": "Unsaved changes",
                         "message": "You have unsaved changes, which will be lost if you close the window. Do you still want to close it?",
-                        "buttons": ["Yes", "Cancel"],
+                        "buttons": ["Close", "Cancel"],
                         "defaultId": 1,
                         "cancelId": 1
                 })
-                if (result == 1) {
-                    e.returnValue = 'true'
+                if (result == 0) {
+                    closeWindow = true
+                    remote.getCurrentWindow().close()
                 }
-            }
+            })
         }
         ipcRenderer.on('new', fileNew)
         $('#file-new').click(fileNew)
