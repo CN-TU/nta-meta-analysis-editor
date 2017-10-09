@@ -1,6 +1,6 @@
 {
   "name": "paper-editor",
-  "version": "0.9.5",
+  "version": "1.0.0",
   "main": "main.js",
   "author": {
     "name": "Gernot Vormayr",
@@ -32,8 +32,8 @@
     "json-editor": "github:notti/json-editor"
   },
   "devDependencies": {
-    "electron": "^1.6.10",
-    "electron-builder": "^18.6.2"
+    "electron": "^1.8.1",
+    "electron-builder": "^18.8.1"
   },
   "scripts": {
     "start": "electron .",
