@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Paper editor</title>
+
+    <!-- Bootstrap -->
+    <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            padding-top: 50px;
+        }
+    </style>
+  </head>
+  <body>
+  <nav class="navbar navbar-fixed-top navbar-default">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <span class="navbar-brand">Super awesome Paper Editor</span>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+            <li><a id="file-new"><span class="glyphicon glyphicon-file"></span> New</a></li>
+            <li><a id="file-open"><span class="glyphicon glyphicon-folder-open"></span> Open</a></li>
+            <li class="disabled" id="file-save-li"><a id="file-save"><span class="glyphicon glyphicon-floppy-disk"></span> Save</a></li>
+            <li><a id="file-save-as"><span class="glyphicon glyphicon-floppy-save"></span> Save as...</a></li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <div class="modal" id="file-open-dialog" tabindex="-1" role="dialog" aria-labelledby="fileopen">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">File open</h4>
+                </div>
+                <div class="modal-body" id="file-open-list">
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal" id="file-save-dialog" tabindex="-1" role="dialog" aria-labelledby="fileopen">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">File save...</h4>
+                </div>
+                <div class="modal-body">
+                    <form id="save-as-form">
+                        <div class="form-group" id="year-group">
+                            <label class="control-label" for="file-year">4-digit year</label>
+                            <input type="text" class="form-control" id="file-year" placeholder="2000" required>
+                            <span class="help-block">Publication year as 4 digit number.</span>
+                        </div>
+                        <div class="form-group" id="name-group">
+                            <label class="control-label" for="file-name">Filename</label>
+                            <input type="text" class="form-control" id="file-name" placeholder="author_title" required>
+                            <span class="help-block">Last name of first author and first (+second) word of title separated by underscore, without json ending (e.g. author_title).</span>
+                        </div>
+                        <button type="submit" class="btn btn-default">Save</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal" id="working" tabindex="-1" role="dialog" aria-labelledby="fileopen">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Working...</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="progress">
+                        <div class="progress-bar active progress-bar-striped" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%;">
+                            <span class="sr-only">Working...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal" id="overwrite" tabindex="-1" role="dialog" aria-labelledby="fileopen">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">File exists</h4>
+                </div>
+                <div class="modal-body">
+                    <p>File already exists. Overwrite?</p>
+                    <button type="button" class="btn btn-primary" id="overwrite-yes">Yes</button>
+                    <button type="button" class="btn btn-default" id="overwrite-no">No</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal" id="changed" tabindex="-1" role="dialog" aria-labelledby="fileopen">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">File changed</h4>
+                </div>
+                <div class="modal-body">
+                    <p>The opened file changed. If you continue, you will loose this changes.</p>
+                    <button type="button" class="btn btn-primary" id="changed-yes">Continue and loose changes</button>
+                    <button type="button" class="btn btn-default" id="changed-no">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="container" role="main">
+        <div class="row">
+            <div id="editor_holder"></div>
+        </div>
+
+    </div>
+
+    <script src="jquery.min.js"></script>
+    <script src="bootstrap/js/bootstrap.min.js"></script>
+    <script src="jsoneditor.min.js"></script>
+    <script src="mustache.min.js"></script>
+    <script id="file-list-template" type="x-tmpl-mustache">
+<div class="list-group">
+{{#files}}
+<a class="list-group-item file-list-file">{{.}}</a>
+{{/files}}
+</div>
+    </script>
+    <script>
+        var editor;
+        var fileChanged = false;
+        var filename = null;
+        var loading = false;
+        $('#changed-no').click(function() {
+            $('#changed').modal('hide');
+        });
+        function canChange(fun) {
+            if(fileChanged) {
+                $('#changed-yes').on('click', function(){
+                    $('#changed-yes').off('click');
+                    $('#changed').modal('hide');
+                    fun();
+                });
+                $('#changed').modal();
+            } else {
+                fun();
+            }
+        }
+        function somethingChanged() {
+            if (loading) {
+                loading = false;
+                return;
+            }
+            fileChanged = true;
+        }
+
+        function setFilename(file) {
+            filename = file;
+            if (file == null) {
+                $('#file-save-li').addClass("disabled");
+            } else {
+                $('#file-save-li').removeClass("disabled");
+            }
+        }
+
+        function storeFile() {
+            if (filename == null) {
+                return;
+            }
+            $('#working').modal();
+            $.ajax('/' + filename, {
+                complete: function() {
+                    $('#file-year').val('');
+                    $('#file-name').val('');
+                    $('#overwrite').modal('hide');
+                    $('#working').modal('hide');
+                    $('#file-save-dialog').modal('hide');
+                    fileChanged = false;
+                },
+            data: JSON.stringify(editor.getValue(), null, 2),
+            processData: false,
+            method: 'PUT'});
+        }
+
+        $('#overwrite-yes').click(function() {
+            storeFile();
+        });
+        $('#overwrite-no').click(function() {
+            $('#overwrite').modal('hide');
+        });
+        
+        $('#save-as-form').submit(function(event) {
+            event.preventDefault();
+            $('#year-group').removeClass('has-error')
+            $('#name-group').removeClass('has-error')
+            ok = true;
+            var yearRe = new RegExp('^\\d{4}$');
+            year = $('#file-year').val();
+            if (!yearRe.test(year)) {
+                $('#year-group').addClass('has-error')
+                ok = false;
+            }
+            var nameRe = new RegExp('^.+_.+$');
+            name = $('#file-name').val();
+            if (!nameRe.test(name) || name.indexOf(".json", name.length - ".json".length) !== -1) {
+                $('#name-group').addClass('has-error')
+                ok = false;
+            }
+            if (!ok) {
+                return;
+            }
+            setFilename('data/v2_papers/' + year + '/'+ name + '.json');
+            $.get('/list_papers', function(data) {
+                for(i=0; i<data.length; i++) {
+                    if (filename == data[i]) {
+                        $('#overwrite').modal();
+                        return;
+                    }
+                }
+                storeFile();
+            });
+        });
+
+        $.get('../schema_v2.json', function(data) {
+            var element = document.getElementById('editor_holder');
+            editor = new JSONEditor(element, {
+                    schema: data,
+                    theme: 'bootstrap3',
+                    iconlib: 'bootstrap3',
+                    });
+            loading = true;
+            editor.on('change', somethingChanged);
+            fileChanged = false;
+        });
+        function fileNew() {
+            loading = true;
+            editor.setValue({});
+            fileChanged = false;
+            setFilename(null);
+        }
+        $('#file-new').click(function() {
+            canChange(fileNew);
+        });
+        $('#file-save').click(function() {
+            storeFile();
+        });
+        $('#file-save-as').click(function() {
+            $('#file-save-dialog').modal();
+        });
+        function fileOpen() {
+            $.get('/list_papers', function(data) {
+                    var template = $('#file-list-template').html();
+                    Mustache.parse(template);
+                    var rendered = Mustache.render(template, {'files': data});
+                    $('#file-open-list').html(rendered);
+                    $('.file-list-file').on('click', function() {
+                        $('#working').modal({
+                            keyboard: false });
+                        setFilename($(this).text());
+                        $.get('/'+filename, function(data) {
+                            loading = true;
+                            editor.setValue(data);
+                            $('#working').modal('hide');
+                            $('#file-open-dialog').modal('hide');
+                            fileChanged = false;
+                        });
+                    });
+                    $('#file-open-dialog').modal();
+            });
+        }
+        $('#file-open').click(function() {
+            canChange(fileOpen);
+        });
+    </script>
+  </body>
+</html>
