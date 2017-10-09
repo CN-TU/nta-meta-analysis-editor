@@ -1,1 +1,1424 @@
-../schema_v2.json
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "Paper",
+  "required": [
+    "version",
+    "reference",
+    "data",
+    "preprocessing",
+    "analysis_method",
+    "evaluation",
+    "result"
+  ],
+  "additionalProperties": false,
+  "definitions": {
+    "feature": {
+      "title": "feature",
+      "type": [
+        "boolean",
+        "number",
+        "string",
+        "object"
+      ],
+      "additionalProperties": {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/feature"
+        },
+        "minItems": 1
+      }
+    },
+    "key": {
+      "type": "array",
+      "title": "key_features",
+      "items": {
+        "$ref": "#/definitions/feature"
+      }
+    },
+    "features": {
+      "type": [
+        "array",
+        "null"
+      ],
+      "items": {
+        "$ref": "#/definitions/feature"
+      }
+    },
+    "tool": {
+      "title": "tool",
+      "type": "object",
+      "format": "grid",
+      "properties": {
+        "name": {
+          "title": "name",
+          "type": "string",
+          "minLength": 1
+        },
+        "detail": {
+          "title": "detail",
+          "type": "string",
+          "minLength": 1
+        },
+        "availability": {
+          "title": "availability",
+          "type": "string",
+          "minLength": 1,
+          "oneOf": [
+            {
+              "title": "default values",
+              "enum": [
+                "public",
+                "private",
+                "public_on_demand",
+                "commercial"
+              ]
+            },
+            {
+              "$ref": "#/definitions/other"
+            },
+            {
+              "$ref": "#/definitions/missing"
+            }
+          ]
+        }
+      },
+      "required": [
+        "name",
+        "availability"
+      ]
+    },
+    "selection": {
+      "title": "selection",
+      "type": "string",
+      "minLength": 1,
+      "oneOf": [
+        {
+          "title": "default values",
+          "enum": [
+            "in_dataset",
+            "feature_selection",
+            "study_based",
+            "tool_based",
+            "expert_knowledge"
+          ]
+        },
+        {
+          "title": "other",
+          "$ref": "#/definitions/other"
+        },
+        {
+          "title": "missing",
+          "$ref": "#/definitions/missing"
+        }
+      ]
+    },
+    "role": {
+      "title": "role",
+      "type": "string",
+      "minLength": 1,
+      "enum": [
+        "main",
+        "competitor",
+        "validation"
+      ]
+    },
+    "goal": {
+      "title": "main_goal",
+      "type": "string",
+      "minLength": 1,
+      "oneOf": [
+        {
+          "title": "default values",
+          "enum": [
+            "anomaly_detection",
+            "application_classification",
+            "attack_classification",
+            "botnet_detection",
+            "classification_for_qos",
+            "classification_of_encrypted_traffic",
+            "ddos_detection",
+            "dos_detection",
+            "http_intrusion_detection",
+            "network_properties_monitoring",
+            "p2p_botnet_detection",
+            "p2p_traffic_classification",
+            "probe_detection",
+            "remote_to_local_detection",
+            "specific_malware_detection",
+            "traffic_classification",
+            "traffic_rate_prediction",
+            "traffic_visualization",
+            "user_to_root_detection"
+          ]
+        },
+        {
+          "title": "other",
+          "$ref": "#/definitions/other"
+        },
+        {
+          "title": "missing",
+          "$ref": "#/definitions/missing"
+        }
+      ]
+    },
+    "time": {
+      "type": [
+        "number",
+        "string"
+      ],
+      "oneOf": [
+        {
+          "type": "string",
+          "minLength": 1,
+          "enum": [
+            "missing"
+          ]
+        },
+        {
+          "type": "number"
+        }
+      ],
+      "title": "time"
+    },
+    "other": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^_[A-Za-z0-9-_]+",
+      "title": "other"
+    },
+    "missing": {
+      "title": "missing",
+      "type": "string",
+      "minLength": 1,
+      "enum": [
+        "missing"
+      ]
+    }
+  },
+  "properties": {
+    "version": {
+      "title": "version",
+      "type": "string",
+      "propertyOrder": 1,
+      "enum": ["v2.1"]
+    },
+    "reference": {
+      "title": "reference",
+      "type": "object",
+      "propertyOrder": 10,
+      "properties": {
+        "title": {
+          "title": "title",
+          "type": "string",
+          "minLength": 1,
+          "propertyOrder": 10
+        },
+        "authors": {
+          "title": "authors",
+          "type": "array",
+          "format": "table",
+          "minItems": 1,
+          "propertyOrder": 20,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "title": "author"
+          }
+        },
+        "publication_name": {
+          "title": "publication_name",
+          "type": "string",
+          "propertyOrder": 30,
+          "minLength": 1
+        },
+        "publication_type": {
+          "title": "publication_type",
+          "type": "string",
+          "minLength": 1,
+          "propertyOrder": 40,
+          "oneOf": [
+            {
+              "enum": [
+                "peer_reviewed_journal",
+                "peer_reviewed_conference",
+                "technical_report",
+                "arxiv"
+              ],
+              "title": "default values"
+            },
+            {
+              "$ref": "#/definitions/other"
+            }
+          ]
+        },
+        "year": {
+          "title": "year",
+          "type": "integer",
+          "propertyOrder": 50,
+          "minimum": 1900
+        },
+        "organization_publishers": {
+          "title": "organization_publishers",
+          "type": "array",
+          "format": "table",
+          "minItems": 1,
+          "propertyOrder": 60,
+          "items": {
+            "title": "organization_publisher",
+            "type": "string",
+            "minLength": 1,
+            "oneOf": [
+              {
+                "title": "default values",
+                "enum": [
+                  "ieee",
+                  "elsevier",
+                  "acm",
+                  "springer",
+                  "wiley",
+                  "taylor_&_francis",
+                  "mdpi"
+                ]
+              },
+              {
+                "$ref": "#/definitions/other"
+              }
+            ]
+          }
+        },
+        "pages_number_of": {
+          "title": "pages_number_of",
+          "type": "integer",
+          "propertyOrder": 70,
+          "minimum": 0
+        },
+        "bibtex": {
+          "type": "object",
+          "title": "bibtex",
+          "format": "grid",
+          "description": "Feel free to add as many other BibTeX fields as you want here. To add new fields, use the \"Properties\" button above.",
+          "propertyOrder": 80,
+          "properties": {
+            "type": {
+              "title": "type",
+              "minLength": 1,
+              "type": "string"
+            },
+            "volume": {
+              "title": "volume",
+              "minLength": 1,
+              "type": "string"
+            },
+            "issue": {
+              "type": "string",
+              "minLength": 1,
+              "title": "issue"
+            },
+            "pages": {
+              "title": "pages",
+              "type": "string",
+              "pattern": "^[0-9]+--[0-9]+$"
+            }
+          },
+          "additionalProperties": {
+            "type": "string"
+          },
+          "required": [
+            "type"
+          ]
+        },
+        "access_open": {
+          "title": "access_open",
+          "propertyOrder": 90,
+          "type": "boolean"
+        },
+        "curated_by": {
+          "title": "curated_by",
+          "type": "string",
+          "propertyOrder": 100,
+          "minLength": 1
+        },
+        "curated_last_revision": {
+          "title": "curated_last_revision",
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^[0-9]{2}-[0-9]{2}-[0-9]{4}$",
+          "propertyOrder": 110,
+          "description": "format: dd-mm-yyyy"
+        },
+        "curated_revision_number": {
+          "title": "curated_revision_number",
+          "type": "integer",
+          "propertyOrder": 120,
+          "minimum": 1
+        }
+      },
+      "required": [
+        "title",
+        "authors",
+        "publication_name",
+        "publication_type",
+        "year",
+        "bibtex",
+        "curated_by",
+        "curated_last_revision",
+        "curated_revision_number"
+      ]
+    },
+    "data": {
+      "title": "data",
+      "type": "object",
+      "propertyOrder": 20,
+      "properties": {
+        "datasets": {
+          "type": "array",
+          "title": "datasets",
+          "items": {
+            "title": "dataset",
+            "type": "object",
+            "properties": {
+              "name": {
+                "title": "name",
+                "type": "string",
+                "propertyOrder": 10,
+                "minLength": 1
+              },
+              "availability": {
+                "title": "availability",
+                "type": "string",
+                "minLength": 1,
+                "propertyOrder": 20,
+                "oneOf": [
+                  {
+                    "enum": [
+                      "public",
+                      "public_on_demand",
+                      "private",
+                      "lost_source"
+                    ],
+                    "title": "default values"
+                  },
+                  {
+                    "$ref": "#/definitions/other"
+                  },
+                  {
+                    "$ref": "#/definitions/missing"
+                  }
+                ]
+              },
+              "format": {
+                "title": "format",
+                "type": "string",
+                "propertyOrder": 30,
+                "minLength": 1,
+                "oneOf": [
+                  {
+                    "title": "default values",
+                    "enum": [
+                      "packet",
+                      "flow"
+                    ]
+                  },
+                  {
+                    "$ref": "#/definitions/other"
+                  },
+                  {
+                    "$ref": "#/definitions/missing"
+                  }
+                ]
+              },
+              "types": {
+                "title": "types",
+                "type": "array",
+                "format": "table",
+                "propertyOrder": 40,
+                "items": {
+                  "title": "type",
+                  "type": "string",
+                  "oneOf": [
+                    {
+                      "enum": [
+                        "ip",
+                        "ipv4",
+                        "ipv6",
+                        "tcp",
+                        "http",
+                        "udp",
+                        "icmp",
+                        "dns",
+                        "tls",
+                        "ipsec"
+                      ],
+                      "title": "default values"
+                    },
+                    {
+                      "$ref": "#/definitions/other"
+                    },
+                    {
+                      "$ref": "#/definitions/missing"
+                    }
+                  ]
+                }
+              },
+              "generation": {
+                "title": "generation",
+                "type": "string",
+                "propertyOrder": 50,
+                "minLength": 1,
+                "oneOf": [
+                  {
+                    "title": "default values",
+                    "enum": [
+                      "captured",
+                      "synthetic",
+                      "altered_captured",
+                      "mixed"
+                    ]
+                  },
+                  {
+                    "$ref": "#/definitions/other"
+                  },
+                  {
+                    "$ref": "#/definitions/missing"
+                  }
+                ]
+              },
+              "generation_year": {
+                "title": "generation_year",
+                "propertyOrder": 60,
+                "oneOf": [
+                  {
+                    "title": "year",
+                    "type": "integer",
+                    "minimum": 1900
+                  },
+                  {
+                    "title": "years",
+                    "type": "array",
+                    "items": {
+                      "type": "integer",
+                      "title": "year",
+                      "minimum": 1900
+                    }
+                  },
+                  {
+                    "$ref": "#/definitions/missing"
+                  }
+                ]
+              },
+              "covered_period": {
+                "title": "covered_period",
+                "type": "string",
+                "propertyOrder": 70,
+                "minLength": 1,
+                "oneOf": [
+                  {
+                    "title": "default values",
+                    "enum": [
+                      "minutes",
+                      "hours",
+                      "days",
+                      "weeks",
+                      "months",
+                      "years"
+                    ]
+                  },
+                  {
+                    "$ref": "#/definitions/other"
+                  },
+                  {
+                    "$ref": "#/definitions/missing"
+                  }
+                ]
+              },
+              "details": {
+                "title": "details",
+                "propertyOrder": 80,
+                "format": "table",
+                "type": "array",
+                "items": {
+                  "title": "detail",
+                  "type": "string",
+                  "minLength": 1,
+                  "oneOf": [
+                    {
+                      "title": "default values",
+                      "enum": [
+                        "raw",
+                        "preprocessed",
+                        "no_payload"
+                      ]
+                    },
+                    {
+                      "$ref": "#/definitions/other"
+                    }
+                  ]
+                }
+              },
+              "subsets": {
+                "title": "subsets",
+                "type": "array",
+                "format": "table",
+                "propertyOrder": 90,
+                "items": {
+                  "title": "subset",
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "anonymized": {
+                "title": "anonymized",
+                "type": "boolean",
+                "propertyOrder": 100
+              }
+            },
+            "required": [
+              "name",
+              "generation_year",
+              "subsets"
+            ]
+          }
+        }
+      }
+    },
+    "preprocessing": {
+      "title": "preprocessing",
+      "type": "object",
+      "propertyOrder": 30,
+      "properties": {
+        "performed_feature_selection": {
+          "title": "performed_feature_selection",
+          "format": "checkbox",
+          "propertyOrder": 10,
+          "type": "boolean"
+        },
+        "packet_analysis_oriented": {
+          "title": "packet_analysis_oriented",
+          "format": "checkbox",
+          "propertyOrder": 20,
+          "type": "boolean"
+        },
+        "flow_analysis_oriented": {
+          "title": "flow_analysis_oriented",
+          "format": "checkbox",
+          "propertyOrder": 30,
+          "type": "boolean"
+        },
+        "flow_aggregation_analysis_oriented": {
+          "title": "flow_aggregation_analysis_oriented",
+          "format": "checkbox",
+          "propertyOrder": 40,
+          "type": "boolean"
+        },
+        "tools": {
+          "title": "tools",
+          "type": "array",
+          "propertyOrder": 50,
+          "items": {
+            "$ref": "#/definitions/tool"
+          }
+        },
+        "normalization_type": {
+          "title": "normalization_type",
+          "type": "string",
+          "minLength": 1,
+          "propertyOrder": 60,
+          "oneOf": [
+            {
+              "title": "default values",
+              "enum": [
+                "no",
+                "not_applicable",
+                "range",
+                "zscore",
+                "decimal_scaling",
+                "quartile"
+              ]
+            },
+            {
+              "$ref": "#/definitions/other"
+            },
+            {
+              "$ref": "#/definitions/missing"
+            }
+          ]
+        },
+        "transformations": {
+          "title": "transformations",
+          "type": "array",
+          "format": "table",
+          "propertyOrder": 70,
+          "items": {
+            "title": "transformation",
+            "type": "string",
+            "minLength": 1,
+            "oneOf": [
+              {
+                "title": "default values",
+                "enum": [
+                  "no",
+                  "sampling",
+                  "filtering",
+                  "log",
+                  "map",
+                  "graph",
+                  "feature_aggregation",
+                  "flow_extraction",
+                  "entropy",
+                  "time_series",
+                  "feature_operation",
+                  "class_separation"
+                ]
+              },
+              {
+                "$ref": "#/definitions/other"
+              },
+              {
+                "$ref": "#/definitions/missing"
+              }
+            ]
+          }
+        },
+        "final_data_format": {
+          "title": "final_data_format",
+          "type": "string",
+          "minLength": 1,
+          "propertyOrder": 80,
+          "oneOf": [
+            {
+              "title": "default values",
+              "enum": [
+                "numerical_vectors",
+                "nominal_vectors",
+                "mixed_vectors",
+                "strings",
+                "time_series"
+              ]
+            },
+            {
+              "$ref": "#/definitions/other"
+            },
+            {
+              "$ref": "#/definitions/missing"
+            }
+          ]
+        },
+        "feature_selections": {
+          "title": "feature_selections",
+          "type": "array",
+          "propertyOrder": 90,
+          "items": {
+            "title": "feature_selection",
+            "type": "object",
+            "format": "grid",
+            "properties": {
+              "name": {
+                "title": "name",
+                "type": "string",
+                "propertyOrder": 10,
+                "minLength": 1
+              },
+              "type": {
+                "title": "type",
+                "type": "string",
+                "propertyOrder": 20,
+                "minLength": 1,
+                "oneOf": [
+                  {
+                    "title": "default values",
+                    "enum": [
+                      "wrapper",
+                      "filter",
+                      "hybrid",
+                      "nest",
+                      "feature_reduction"
+                    ]
+                  },
+                  {
+                    "$ref": "#/definitions/other"
+                  },
+                  {
+                    "$ref": "#/definitions/missing"
+                  }
+                ]
+              },
+              "classifier": {
+                "title": "classifier",
+                "type": "string",
+                "propertyOrder": 30,
+                "minLength": 1
+              },
+              "role": {
+                "propertyOrder": 40,
+                "$ref": "#/definitions/role"
+              }
+            },
+            "required": [
+              "name"
+            ]
+          }
+        },
+        "packets": {
+          "title": "packets",
+          "type": "array",
+          "propertyOrder": 100,
+          "items": {
+            "title": "packet",
+            "type": "object",
+            "properties": {
+              "selection": {
+                "propertyOrder": 10,
+                "$ref": "#/definitions/selection"
+              },
+              "role": {
+                "propertyOrder": 20,
+                "$ref": "#/definitions/role"
+              },
+              "main_goal": {
+                "propertyOrder": 30,
+                "$ref": "#/definitions/goal"
+              },
+              "features": {
+                "propertyOrder": 40,
+                "$ref": "#/definitions/features"
+              }
+            }
+          }
+        },
+        "flows": {
+          "title": "flows",
+          "type": "array",
+          "propertyOrder": 110,
+          "items": {
+            "title": "flow",
+            "type": "object",
+            "properties": {
+              "selection": {
+                "propertyOrder": 10,
+                "$ref": "#/definitions/selection"
+              },
+              "role": {
+                "propertyOrder": 20,
+                "$ref": "#/definitions/role"
+              },
+              "main_goal": {
+                "propertyOrder": 30,
+                "$ref": "#/definitions/goal"
+              },
+              "active_timeout": {
+                "propertyOrder": 40,
+                "title": "active_timeout",
+                "oneOf": [
+                  {
+                    "$ref": "#/definitions/time"
+                  },
+                  {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/definitions/time"
+                    },
+                    "title": "times"
+                  }
+                ]
+              },
+              "idle_timeout": {
+                "title": "idle_timeout",
+                "propertyOrder": 50,
+                "oneOf": [
+                  {
+                    "$ref": "#/definitions/time"
+                  },
+                  {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/definitions/time"
+                    },
+                    "title": "times"
+                  }
+                ]
+              },
+              "bidirectional": {
+                "propertyOrder": 60,
+                "title": "bidirectional",
+                "type": "boolean"
+              },
+              "features": {
+                "propertyOrder": 70,
+                "$ref": "#/definitions/features"
+              },
+              "key_features": {
+                "propertyOrder": 80,
+                "$ref": "#/definitions/key"
+              }
+            }
+          }
+        },
+        "flow_aggregations": {
+          "title": "flow_aggregations",
+          "type": "array",
+          "propertyOrder": 120,
+          "items": {
+            "title": "flow_aggregation",
+            "type": "object",
+            "properties": {
+              "selection": {
+                "propertyOrder": 10,
+                "$ref": "#/definitions/selection"
+              },
+              "role": {
+                "propertyOrder": 20,
+                "$ref": "#/definitions/role"
+              },
+              "main_goal": {
+                "propertyOrder": 30,
+                "$ref": "#/definitions/goal"
+              },
+              "active_timeout": {
+                "propertyOrder": 40,
+                "title": "active_timeout",
+                "oneOf": [
+                  {
+                    "$ref": "#/definitions/time"
+                  },
+                  {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/definitions/time"
+                    },
+                    "title": "times"
+                  }
+                ]
+              },
+              "features": {
+                "propertyOrder": 50,
+                "$ref": "#/definitions/features"
+              },
+              "key_features": {
+                "propertyOrder": 60,
+                "$ref": "#/definitions/key"
+              }
+            }
+          }
+        }
+      },
+      "required": [
+        "performed_feature_selection",
+        "packet_analysis_oriented",
+        "flow_analysis_oriented",
+        "flow_aggregation_analysis_oriented",
+        "tools",
+        "normalization_type",
+        "transformations",
+        "final_data_format"
+      ]
+    },
+    "analysis_method": {
+      "title": "analysis_method",
+      "type": "object",
+      "propertyOrder": 40,
+      "properties": {
+        "supervised_learning": {
+          "title": "supervised_learning",
+          "propertyOrder": 10,
+          "format": "checkbox",
+          "type": "boolean"
+        },
+        "unsupervised_learning": {
+          "title": "unsupervised_learning",
+          "propertyOrder": 20,
+          "format": "checkbox",
+          "type": "boolean"
+        },
+        "semisupervised_learning": {
+          "title": "semisupervised_learning",
+          "propertyOrder": 30,
+          "format": "checkbox",
+          "type": "boolean"
+        },
+        "anomaly_detection": {
+          "title": "anomaly_detection",
+          "propertyOrder": 40,
+          "format": "checkbox",
+          "type": "boolean"
+        },
+        "tools": {
+          "title": "tools",
+          "type": "array",
+          "propertyOrder": 50,
+          "items": {
+            "$ref": "#/definitions/tool"
+          }
+        },
+        "algorithms": {
+          "title": "algorithms",
+          "type": "array",
+          "propertyOrder": 60,
+          "items": {
+            "title": "algorithm",
+            "type": "object",
+            "properties": {
+              "name": {
+                "title": "name",
+                "type": "string",
+                "propertyOrder": 10,
+                "minLength": 1
+              },
+              "subname": {
+                "title": "subname",
+                "type": "string",
+                "propertyOrder": 20,
+                "minLength": 1
+              },
+              "learning": {
+                "title": "learning",
+                "type": "string",
+                "propertyOrder": 30,
+                "minLength": 1,
+                "oneOf": [
+                  {
+                    "title": "default values",
+                    "enum": [
+                      "supervised",
+                      "unsupervised",
+                      "semisupervised",
+                      "statistics/model_fit",
+                      "nest",
+                      "no"
+                    ]
+                  },
+                  {
+                    "$ref": "#/definitions/other"
+                  },
+                  {
+                    "$ref": "#/definitions/missing"
+                  }
+                ]
+              },
+              "role": {
+                "propertyOrder": 40,
+                "$ref": "#/definitions/role"
+              },
+              "type": {
+                "title": "type",
+                "type": "string",
+                "propertyOrder": 50,
+                "minLength": 1,
+                "oneOf": [
+                  {
+                    "title": "default values",
+                    "enum": [
+                      "classification",
+                      "regression",
+                      "clustering",
+                      "heuristics",
+                      "anomaly_detection",
+                      "statistics",
+                      "text_matching"
+                    ]
+                  },
+                  {
+                    "$ref": "#/definitions/other"
+                  },
+                  {
+                    "$ref": "#/definitions/missing"
+                  }
+                ]
+              },
+              "metric/decision_criteria": {
+                "title": "metric/decision_criteria",
+                "type": "string",
+                "minLength": 1,
+                "propertyOrder": 60,
+                "oneOf": [
+                  {
+                    "title": "default values",
+                    "enum": [
+                      "error/fitting_function",
+                      "euclidean",
+                      "mutual_information",
+                      "correlation",
+                      "jaccard",
+                      "mahalanobis",
+                      "hamming",
+                      "exact_matching",
+                      "manhattan",
+                      "probabilistic",
+                      "vote",
+                      "no"
+                    ]
+                  },
+                  {
+                    "$ref": "#/definitions/other"
+                  },
+                  {
+                    "$ref": "#/definitions/missing"
+                  }
+                ]
+              },
+              "tools": {
+                "title": "tools",
+                "type": "array",
+                "propertyOrder": 70,
+                "items": {
+                  "$ref": "#/definitions/tool"
+                }
+              },
+              "source": {
+                "title": "source",
+                "type": "string",
+                "minLength": 1,
+                "propertyOrder": 80,
+                "oneOf": [
+                  {
+                    "title": "default values",
+                    "enum": [
+                      "own_proposed",
+                      "own_referenced",
+                      "referenced"
+                    ]
+                  },
+                  {
+                    "$ref": "#/definitions/other"
+                  },
+                  {
+                    "$ref": "#/definitions/missing"
+                  }
+                ]
+              },
+              "parameters_provided": {
+                "title": "parameters_provided",
+                "propertyOrder": 90,
+                "oneOf": [
+                  {
+                    "title": "boolean",
+                    "type": "boolean"
+                  },
+                  {
+                    "title": "partially",
+                    "enum": [
+                      "partially"
+                    ]
+                  }
+                ]
+              }
+            },
+            "required": [
+              "name"
+            ]
+          }
+        }
+      },
+      "required": [
+        "supervised_learning",
+        "unsupervised_learning",
+        "semisupervised_learning",
+        "anomaly_detection",
+        "tools"
+      ]
+    },
+    "evaluation": {
+      "title": "evaluation",
+      "type": "object",
+      "propertyOrder": 50,
+      "properties": {
+        "algorithm_comparison": {
+          "title": "algorithm_comparison",
+          "propertyOrder": 10,
+          "format": "checkbox",
+          "type": "boolean"
+        },
+        "internal_validation": {
+          "title": "internal_validation",
+          "propertyOrder": 20,
+          "format": "checkbox",
+          "type": "boolean"
+        },
+        "external_validation": {
+          "title": "external_validation",
+          "propertyOrder": 30,
+          "format": "checkbox",
+          "type": "boolean"
+        },
+        "dpi-based_validation": {
+          "title": "dpi-based_validation",
+          "propertyOrder": 40,
+          "format": "checkbox",
+          "type": "boolean"
+        },
+        "port-based_validation": {
+          "title": "port-based_validation",
+          "propertyOrder": 50,
+          "format": "checkbox",
+          "type": "boolean"
+        },
+        "pre-knowledge-based_validation": {
+          "title": "pre-knowledge-based_validation",
+          "propertyOrder": 60,
+          "format": "checkbox",
+          "type": "boolean"
+        },
+        "manual_verification": {
+          "title": "manual_verification",
+          "propertyOrder": 70,
+          "format": "checkbox",
+          "type": "boolean"
+        },
+        "implementation_in_real_scenario": {
+          "title": "implementation_in_real_scenario",
+          "propertyOrder": 80,
+          "format": "checkbox",
+          "type": "boolean"
+        },
+        "train_test_separation": {
+          "title": "train_test_separation",
+          "propertyOrder": 90,
+          "format": "checkbox",
+          "type": "boolean"
+        },
+        "methods": {
+          "title": "methods",
+          "type": "array",
+          "propertyOrder": 100,
+          "items": {
+            "title": "evaluation_method",
+            "type": "object",
+            "format": "grid",
+            "properties": {
+              "name": {
+                "title": "name",
+                "type": "string",
+                "propertyOrder": 10,
+                "minLength": 1
+              },
+              "type": {
+                "title": "type",
+                "type": "string",
+                "minLength": 1,
+                "propertyOrder": 20,
+                "oneOf": [
+                  {
+                    "title": "default values",
+                    "enum": [
+                      "external",
+                      "internal",
+                      "external_and_internal",
+                      "nest"
+                    ]
+                  },
+                  {
+                    "$ref": "#/definitions/other"
+                  },
+                  {
+                    "$ref": "#/definitions/missing"
+                  }
+                ]
+              },
+              "metrics": {
+                "title": "metrics",
+                "type": "array",
+                "propertyOrder": 30,
+                "items": {
+                  "title": "metric",
+                  "type": "string",
+                  "minLength": 1,
+                  "oneOf": [
+                    {
+                      "title": "default values",
+                      "enum": [
+                        "error_distance",
+                        "precision",
+                        "accuracy",
+                        "f-1",
+                        "roc/uac",
+                        "complete_confusion_matrix",
+                        "incomplete_confusion_matrix",
+                        "classification_loss",
+                        "clustering_metrics",
+                        "time-based",
+                        "computing_resources-based",
+                        "granularity-based",
+                        "heuristic",
+                        "vote"
+                      ]
+                    },
+                    {
+                      "$ref": "#/definitions/other"
+                    },
+                    {
+                      "$ref": "#/definitions/missing"
+                    }
+                  ]
+                }
+              },
+              "source": {
+                "title": "source",
+                "type": "string",
+                "propertyOrder": 40,
+                "minLength": 1,
+                "oneOf": [
+                  {
+                    "title": "default values",
+                    "enum": [
+                      "own_proposed",
+                      "own_referenced",
+                      "referenced",
+                      "popular"
+                    ]
+                  },
+                  {
+                    "$ref": "#/definitions/other"
+                  },
+                  {
+                    "$ref": "#/definitions/missing"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "name"
+            ]
+          }
+        }
+      },
+      "required": [
+        "algorithm_comparison",
+        "internal_validation",
+        "external_validation",
+        "dpi-based_validation",
+        "implementation_in_real_scenario",
+        "train_test_separation",
+        "port-based_validation",
+        "pre-knowledge-based_validation",
+        "manual_verification"
+      ]
+    },
+    "result": {
+      "title": "result",
+      "type": "object",
+      "propertyOrder": 60,
+      "properties": {
+        "main_goal": {
+          "title": "main_goal",
+          "type": "string",
+          "propertyOrder": 10,
+          "minLength": 1,
+          "oneOf": [
+            {
+              "title": "default values",
+              "enum": [
+                "anomaly_detection",
+                "traffic_classification",
+                "botnet_detection",
+                "specific_malware_detection",
+                "network_properties_monitoring"
+              ]
+            },
+            {
+              "$ref": "#/definitions/other"
+            },
+            {
+              "$ref": "#/definitions/missing"
+            }
+          ]
+        },
+        "subgoals": {
+          "title": "subgoals",
+          "propertyOrder": 20,
+          "type": "array",
+          "format": "table",
+          "items": {
+            "$ref": "#/definitions/goal"
+          }
+        },
+        "focus_main": {
+          "title": "focus_main",
+          "type": "string",
+          "propertyOrder": 30,
+          "minLength": 1,
+          "oneOf": [
+            {
+              "title": "default values",
+              "enum": [
+                "algorithm",
+                "methodology/framework",
+                "features",
+                "pattern_analysis",
+                "outlier_analysis",
+                "data_description"
+              ]
+            },
+            {
+              "$ref": "#/definitions/other"
+            },
+            {
+              "$ref": "#/definitions/missing"
+            }
+          ]
+        },
+        "claimed_improvements": {
+          "title": "claimed_improvements",
+          "type": "array",
+          "propertyOrder": 40,
+          "format": "table",
+          "items": {
+            "title": "improvement",
+            "type": "string",
+            "minLength": 1,
+            "oneOf": [
+              {
+                "title": "default values",
+                "enum": [
+                  "improved_detection_rates",
+                  "improved_traffic_classification",
+                  "new_phenomena_disclosed",
+                  "fast_processing",
+                  "reduced_computational_resources",
+                  "good_transportability",
+                  "enhanced_functionality",
+                  "improved_data_description",
+                  "parallelization_oriented",
+                  "big_data_oriented",
+                  "data_stream_oriented"
+                ]
+              },
+              {
+                "$ref": "#/definitions/other"
+              },
+              {
+                "$ref": "#/definitions/missing"
+              }
+            ]
+          }
+        },
+        "reproducibility": {
+          "title": "reproducibility",
+          "type": "string",
+          "propertyOrder": 50,
+          "minLength": 1,
+          "oneOf": [
+            {
+              "title": "default values",
+              "enum": [
+                "reproducible",
+                "replicable",
+                "repeatable",
+                "no"
+              ]
+            },
+            {
+              "$ref": "#/definitions/other"
+            },
+            {
+              "$ref": "#/definitions/missing"
+            }
+          ]
+        }
+      },
+      "required": [
+        "main_goal",
+        "focus_main",
+        "claimed_improvements"
+      ]
+    }
+  }
+}
