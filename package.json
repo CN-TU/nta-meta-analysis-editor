@@ -1,13 +1,13 @@
 {
   "name": "paper-editor",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "main": "main.js",
   "author": {
     "name": "Gernot Vormayr",
     "email": "gernot.vormayr@nt.tuwien.ac.at"
   },
   "license": "gpl",
-  "homepage": "https://github.com/CN-TU/nta-meta-analysis",
+  "homepage": "https://github.com/CN-TU/nta-meta-analysis-editor",
   "build": {
     "appId": "com.cn.paper-editor",
     "win": {
@@ -28,7 +28,7 @@
   },
   "dependencies": {
     "bootstrap": "^3.3.7",
-    "jquery": "^3.2.1",
+    "jquery": "^3.3.1",
     "json-editor": "github:notti/json-editor"
   },
   "devDependencies": {
