@@ -38,7 +38,7 @@
     "json-editor": "github:notti/json-editor"
   },
   "devDependencies": {
-    "electron": "^1.8.1",
+    "electron": "^1.8.2",
     "electron-builder": "^18.8.1"
   },
   "scripts": {
