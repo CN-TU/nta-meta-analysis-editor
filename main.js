@@ -10,6 +10,32 @@ const API_URL = "https://api.github.com/repos/"
 const DL_URL = "https://raw.githubusercontent.com/"
 
 var windows = {}
+var helpwindow = null
+
+function displayHelp(url) {
+    if (helpwindow === null) {
+        helpwindow = new BrowserWindow({
+            title: "NTA Help",
+            webPreferences: {
+                devTools: false,
+                nodeIntegration: false,
+
+            }
+        });
+        helpwindow.on('closed', ()=>{
+            helpwindow = null;
+        })
+        helpwindow.on('page-title-updated', (event)=>{
+            event.preventDefault();
+        })
+        helpwindow.setMenu(null);
+    }
+    helpwindow.loadURL(url);
+    if (helpwindow.isMinimized()) {
+        helpwindow.restore();
+    }
+    helpwindow.focus();
+}
 
 function createWindow (filename) {
     win = new BrowserWindow()
@@ -23,8 +49,20 @@ function createWindow (filename) {
         search: filename
     }))
 
+    win.webContents.on('will-navigate', (event, url) => {
+        if (url.startsWith('http://') || url.startsWith('https://')) {
+            event.preventDefault()
+            displayHelp(url)
+        }
+    });
+
     win.on('closed', () => {
         delete windows[id]
+        if (Object.keys(windows).length == 0 && helpwindow !== null) {
+            helpwindow.destroy();
+            helpwindow = null;
+            app.quit();
+        }
     })
 }
 
