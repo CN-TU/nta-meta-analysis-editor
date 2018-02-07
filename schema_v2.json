@@ -30,12 +30,13 @@
     },
     "key": {
       "type": "array",
-      "title": "key_features",
+      "title": "key_features <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/features.html\">help</a>",
       "items": {
         "$ref": "#/definitions/feature"
       }
     },
     "features": {
+      "title": "features <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/features.html\">help</a>",
       "type": [
         "array",
         "null"
@@ -50,17 +51,17 @@
       "format": "grid",
       "properties": {
         "name": {
-          "title": "name",
+          "title": "name <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/preprocessing.html#name\">help</a>",
           "type": "string",
           "minLength": 1
         },
         "detail": {
-          "title": "detail",
+          "title": "detail <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/preprocessing.html#detail-optional\">help</a>",
           "type": "string",
           "minLength": 1
         },
         "availability": {
-          "title": "availability",
+          "title": "availability <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/preprocessing.html#availability\">help</a>",
           "type": "string",
           "minLength": 1,
           "oneOf": [
@@ -88,7 +89,7 @@
       ]
     },
     "selection": {
-      "title": "selection",
+      "title": "selection <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/preprocessing.html#selection-optional\">help</a>",
       "type": "string",
       "minLength": 1,
       "oneOf": [
@@ -113,7 +114,7 @@
       ]
     },
     "role": {
-      "title": "role",
+      "title": "role <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/preprocessing.html#role-optional\">help</a>",
       "type": "string",
       "minLength": 1,
       "enum": [
@@ -208,13 +209,13 @@
       "propertyOrder": 10,
       "properties": {
         "title": {
-          "title": "title",
+          "title": "title <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/reference.html#title\">help</a>",
           "type": "string",
           "minLength": 1,
           "propertyOrder": 10
         },
         "authors": {
-          "title": "authors",
+          "title": "authors <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/reference.html#authors\">help</a>",
           "type": "array",
           "format": "table",
           "minItems": 1,
@@ -226,13 +227,13 @@
           }
         },
         "publication_name": {
-          "title": "publication_name",
+          "title": "publication_name <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/reference.html#publication-name\">help</a>",
           "type": "string",
           "propertyOrder": 30,
           "minLength": 1
         },
         "publication_type": {
-          "title": "publication_type",
+          "title": "publication_type <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/reference.html#publication-type\">help</a>",
           "type": "string",
           "minLength": 1,
           "propertyOrder": 40,
@@ -252,13 +253,13 @@
           ]
         },
         "year": {
-          "title": "year",
+          "title": "year <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/reference.html#year\">help</a>",
           "type": "integer",
           "propertyOrder": 50,
           "minimum": 1900
         },
         "organization_publishers": {
-          "title": "organization_publishers",
+          "title": "organization_publishers <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/reference.html#organization-publishers-optional\">help</a>",
           "type": "array",
           "format": "table",
           "minItems": 1,
@@ -287,14 +288,14 @@
           }
         },
         "pages_number_of": {
-          "title": "pages_number_of",
+          "title": "pages_number_of <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/reference.html#pages-number-of-optional\">help</a>",
           "type": "integer",
           "propertyOrder": 70,
           "minimum": 0
         },
         "bibtex": {
           "type": "object",
-          "title": "bibtex",
+          "title": "bibtex <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/reference.html#bibtex\">help</a>",
           "format": "grid",
           "description": "Feel free to add as many other BibTeX fields as you want here. To add new fields, use the \"Properties\" button above.",
           "propertyOrder": 80,
@@ -328,18 +329,18 @@
           ]
         },
         "access_open": {
-          "title": "access_open",
+          "title": "access_open <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/reference.html#access-open-optional\">help</a>",
           "propertyOrder": 90,
           "type": "boolean"
         },
         "curated_by": {
-          "title": "curated_by",
+          "title": "curated_by <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/reference.html#curated-by\">help</a>",
           "type": "string",
           "propertyOrder": 100,
           "minLength": 1
         },
         "curated_last_revision": {
-          "title": "curated_last_revision",
+          "title": "curated_last_revision <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/reference.html#curated-last-revision\">help</a>",
           "type": "string",
           "minLength": 1,
           "pattern": "^[0-9]{2}-[0-9]{2}-[0-9]{4}$",
@@ -347,7 +348,7 @@
           "description": "format: dd-mm-yyyy"
         },
         "curated_revision_number": {
-          "title": "curated_revision_number",
+          "title": "curated_revision_number <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/reference.html#curated-revision-number\">help</a>",
           "type": "integer",
           "propertyOrder": 120,
           "minimum": 1
@@ -378,13 +379,13 @@
             "type": "object",
             "properties": {
               "name": {
-                "title": "name",
+                "title": "name <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/data.html#name\">help</a>",
                 "type": "string",
                 "propertyOrder": 10,
                 "minLength": 1
               },
               "availability": {
-                "title": "availability",
+                "title": "availability <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/data.html#availability\">help</a>",
                 "type": "string",
                 "minLength": 1,
                 "propertyOrder": 20,
@@ -407,7 +408,7 @@
                 ]
               },
               "format": {
-                "title": "format",
+                "title": "format <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/data.html#format-optional\">help</a>",
                 "type": "string",
                 "propertyOrder": 30,
                 "minLength": 1,
@@ -428,7 +429,7 @@
                 ]
               },
               "types": {
-                "title": "types",
+                "title": "types <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/data.html#types-optional\">help</a>",
                 "type": "array",
                 "format": "table",
                 "propertyOrder": 40,
@@ -461,7 +462,7 @@
                 }
               },
               "generation": {
-                "title": "generation",
+                "title": "generation <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/data.html#generation-optional\">help</a>",
                 "type": "string",
                 "propertyOrder": 50,
                 "minLength": 1,
@@ -484,7 +485,7 @@
                 ]
               },
               "generation_year": {
-                "title": "generation_year",
+                "title": "generation_year <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/data.html#generation-year\">help</a>",
                 "propertyOrder": 60,
                 "oneOf": [
                   {
@@ -507,7 +508,7 @@
                 ]
               },
               "covered_period": {
-                "title": "covered_period",
+                "title": "covered_period <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/data.html#covered-period-optional\">help</a>",
                 "type": "string",
                 "propertyOrder": 70,
                 "minLength": 1,
@@ -532,7 +533,7 @@
                 ]
               },
               "details": {
-                "title": "details",
+                "title": "details <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/data.html#details-optional\">help</a>",
                 "propertyOrder": 80,
                 "format": "table",
                 "type": "array",
@@ -556,7 +557,7 @@
                 }
               },
               "subsets": {
-                "title": "subsets",
+                "title": "subsets <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/data.html#subsets\">help</a>",
                 "type": "array",
                 "format": "table",
                 "propertyOrder": 90,
@@ -567,7 +568,7 @@
                 }
               },
               "anonymized": {
-                "title": "anonymized",
+                "title": "anonymized <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/data.html#anonymized-optional\">help</a>",
                 "type": "boolean",
                 "propertyOrder": 100
               }
@@ -587,31 +588,32 @@
       "propertyOrder": 30,
       "properties": {
         "performed_feature_selection": {
-          "title": "performed_feature_selection",
+          "title": "performed_feature_selection <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/preprocessing.html#performed-feature-selection\">help</a>",
           "format": "checkbox",
           "propertyOrder": 10,
           "type": "boolean"
         },
         "packet_analysis_oriented": {
-          "title": "packet_analysis_oriented",
+          "title": "packet_analysis_oriented <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/preprocessing.html#packet-analysis-oriented\">help</a>",
           "format": "checkbox",
           "propertyOrder": 20,
           "type": "boolean"
         },
         "flow_analysis_oriented": {
-          "title": "flow_analysis_oriented",
+          "title": "flow_analysis_oriented <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/preprocessing.html#flow-analysis-oriented\">help</a>",
           "format": "checkbox",
           "propertyOrder": 30,
           "type": "boolean"
         },
         "flow_aggregation_analysis_oriented": {
           "title": "flow_aggregation_analysis_oriented",
+          "title": "flow_analysis_oriented <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/preprocessing.html#flow_aggregation-aggregation-analysis-oriented\">help</a>",
           "format": "checkbox",
           "propertyOrder": 40,
           "type": "boolean"
         },
         "tools": {
-          "title": "tools",
+          "title": "tools <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/preprocessing.html#tools\">help</a>",
           "type": "array",
           "propertyOrder": 50,
           "items": {
@@ -619,7 +621,7 @@
           }
         },
         "normalization_type": {
-          "title": "normalization_type",
+          "title": "normalization_type <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/preprocessing.html#normalization-type\">help</a>",
           "type": "string",
           "minLength": 1,
           "propertyOrder": 60,
@@ -644,7 +646,7 @@
           ]
         },
         "transformations": {
-          "title": "transformations",
+          "title": "transformations <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/preprocessing.html#transformations\">help</a>",
           "type": "array",
           "format": "table",
           "propertyOrder": 70,
@@ -680,7 +682,7 @@
           }
         },
         "final_data_format": {
-          "title": "final_data_format",
+          "title": "final_data_format <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/preprocessing.html#final-data-format\">help</a>",
           "type": "string",
           "minLength": 1,
           "propertyOrder": 80,
@@ -713,13 +715,13 @@
             "format": "grid",
             "properties": {
               "name": {
-                "title": "name",
+                "title": "name <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/preprocessing.html#id2\">help</a>",
                 "type": "string",
                 "propertyOrder": 10,
                 "minLength": 1
               },
               "type": {
-                "title": "type",
+                "title": "type <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/preprocessing.html#type-optional\">help</a>",
                 "type": "string",
                 "propertyOrder": 20,
                 "minLength": 1,
@@ -743,7 +745,7 @@
                 ]
               },
               "classifier": {
-                "title": "classifier",
+                "title": "classifier <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/preprocessing.html#classifier-optional\">help</a>",
                 "type": "string",
                 "propertyOrder": 30,
                 "minLength": 1
@@ -776,6 +778,7 @@
               },
               "main_goal": {
                 "propertyOrder": 30,
+      "title": "main_goal <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/preprocessing.html#main-goal-optional\">help</a>",
                 "$ref": "#/definitions/goal"
               },
               "features": {
@@ -803,11 +806,12 @@
               },
               "main_goal": {
                 "propertyOrder": 30,
+      "title": "main_goal <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/preprocessing.html#main-goal-optional\">help</a>",
                 "$ref": "#/definitions/goal"
               },
               "active_timeout": {
                 "propertyOrder": 40,
-                "title": "active_timeout",
+                "title": "active_timeout <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/preprocessing.html#active-timeout-optional\">help</a>",
                 "oneOf": [
                   {
                     "$ref": "#/definitions/time"
@@ -822,7 +826,7 @@
                 ]
               },
               "idle_timeout": {
-                "title": "idle_timeout",
+                "title": "idle_timeout <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/preprocessing.html#idle-timeout-optional\">help</a>",
                 "propertyOrder": 50,
                 "oneOf": [
                   {
@@ -839,7 +843,7 @@
               },
               "bidirectional": {
                 "propertyOrder": 60,
-                "title": "bidirectional",
+                "title": "bidirectional <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/preprocessing.html#bidirectional-optional\">help</a>",
                 "type": "boolean"
               },
               "features": {
@@ -871,11 +875,17 @@
               },
               "main_goal": {
                 "propertyOrder": 30,
+      "title": "main_goal <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/preprocessing.html#main-goal-optional\">help</a>",
                 "$ref": "#/definitions/goal"
+              },
+              "bidirectional": {
+                "propertyOrder": 35,
+                "title": "bidirectional <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/preprocessing.html#bidirectional-optional\">help</a>",
+                "type": "boolean"
               },
               "active_timeout": {
                 "propertyOrder": 40,
-                "title": "active_timeout",
+                "title": "active_timeout <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/preprocessing.html#active-timeout-optional\">help</a>",
                 "oneOf": [
                   {
                     "$ref": "#/definitions/time"
@@ -918,25 +928,25 @@
       "propertyOrder": 40,
       "properties": {
         "supervised_learning": {
-          "title": "supervised_learning",
+          "title": "supervised_learning <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/analysis_method.html#supervised-learning\">help</a>",
           "propertyOrder": 10,
           "format": "checkbox",
           "type": "boolean"
         },
         "unsupervised_learning": {
-          "title": "unsupervised_learning",
+          "title": "unsupervised_learning <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/analysis_method.html#unsupervised-learning\">help</a>",
           "propertyOrder": 20,
           "format": "checkbox",
           "type": "boolean"
         },
         "semisupervised_learning": {
-          "title": "semisupervised_learning",
+          "title": "semisupervised_learning <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/analysis_method.html#semisupervised-learning\">help</a>",
           "propertyOrder": 30,
           "format": "checkbox",
           "type": "boolean"
         },
         "anomaly_detection": {
-          "title": "anomaly_detection",
+          "title": "anomaly_detection <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/analysis_method.html#anomaly-detection\">help</a>",
           "propertyOrder": 40,
           "format": "checkbox",
           "type": "boolean"
@@ -958,19 +968,19 @@
             "type": "object",
             "properties": {
               "name": {
-                "title": "name",
+                "title": "name <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/analysis_method.html#id2\">help</a>",
                 "type": "string",
                 "propertyOrder": 10,
                 "minLength": 1
               },
               "subname": {
-                "title": "subname",
+                "title": "subname <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/analysis_method.html#subname-optional\">help</a>",
                 "type": "string",
                 "propertyOrder": 20,
                 "minLength": 1
               },
               "learning": {
-                "title": "learning",
+                "title": "learning <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/analysis_method.html#learning-optional\">help</a>",
                 "type": "string",
                 "propertyOrder": 30,
                 "minLength": 1,
@@ -999,7 +1009,7 @@
                 "$ref": "#/definitions/role"
               },
               "type": {
-                "title": "type",
+                "title": "type <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/analysis_method.html#type-optional\">help</a>",
                 "type": "string",
                 "propertyOrder": 50,
                 "minLength": 1,
@@ -1025,7 +1035,7 @@
                 ]
               },
               "metric/decision_criteria": {
-                "title": "metric/decision_criteria",
+                "title": "metric/decision_criteria <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/analysis_method.html#metric-decision-criteria-optional\">help</a>",
                 "type": "string",
                 "minLength": 1,
                 "propertyOrder": 60,
@@ -1064,7 +1074,7 @@
                 }
               },
               "source": {
-                "title": "source",
+                "title": "source <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/analysis_method.html#source-optional\">help</a>",
                 "type": "string",
                 "minLength": 1,
                 "propertyOrder": 80,
@@ -1086,7 +1096,7 @@
                 ]
               },
               "parameters_provided": {
-                "title": "parameters_provided",
+                "title": "parameters_provided <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/analysis_method.html#parameters-provided-optional\">help</a>",
                 "propertyOrder": 90,
                 "oneOf": [
                   {
@@ -1122,55 +1132,55 @@
       "propertyOrder": 50,
       "properties": {
         "algorithm_comparison": {
-          "title": "algorithm_comparison",
+          "title": "algorithm_comparison <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/evaluation.html#algorithm-comparison\">help</a>",
           "propertyOrder": 10,
           "format": "checkbox",
           "type": "boolean"
         },
         "internal_validation": {
-          "title": "internal_validation",
+          "title": "internal_validation <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/evaluation.html#internal-validation\">help</a>",
           "propertyOrder": 20,
           "format": "checkbox",
           "type": "boolean"
         },
         "external_validation": {
-          "title": "external_validation",
+          "title": "external_validation <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/evaluation.html#external-validation\">help</a>",
           "propertyOrder": 30,
           "format": "checkbox",
           "type": "boolean"
         },
         "dpi-based_validation": {
-          "title": "dpi-based_validation",
+          "title": "dpi-based_validation <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/evaluation.html#dpi-based-validation\">help</a>",
           "propertyOrder": 40,
           "format": "checkbox",
           "type": "boolean"
         },
         "port-based_validation": {
-          "title": "port-based_validation",
+          "title": "port-based_validation <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/evaluation.html#port-based-validation\">help</a>",
           "propertyOrder": 50,
           "format": "checkbox",
           "type": "boolean"
         },
         "pre-knowledge-based_validation": {
-          "title": "pre-knowledge-based_validation",
+          "title": "pre-knowledge-based_validation <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/evaluation.html#pre-knowledge-based-validation\">help</a>",
           "propertyOrder": 60,
           "format": "checkbox",
           "type": "boolean"
         },
         "manual_verification": {
-          "title": "manual_verification",
+          "title": "manual_verification <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/evaluation.html#manual-verification\">help</a>",
           "propertyOrder": 70,
           "format": "checkbox",
           "type": "boolean"
         },
         "implementation_in_real_scenario": {
-          "title": "implementation_in_real_scenario",
+          "title": "implementation_in_real_scenario <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/evaluation.html#implementation-in-real-scenario\">help</a>",
           "propertyOrder": 80,
           "format": "checkbox",
           "type": "boolean"
         },
         "train_test_separation": {
-          "title": "train_test_separation",
+          "title": "train_test_separation <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/evaluation.html#train-test-separation\">help</a>",
           "propertyOrder": 90,
           "format": "checkbox",
           "type": "boolean"
@@ -1185,13 +1195,13 @@
             "format": "grid",
             "properties": {
               "name": {
-                "title": "name",
+                "title": "name <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/evaluation.html#name\">help</a>",
                 "type": "string",
                 "propertyOrder": 10,
                 "minLength": 1
               },
               "type": {
-                "title": "type",
+                "title": "type <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/evaluation.html#type-optional\">help</a>",
                 "type": "string",
                 "minLength": 1,
                 "propertyOrder": 20,
@@ -1214,7 +1224,7 @@
                 ]
               },
               "metrics": {
-                "title": "metrics",
+                "title": "metrics <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/evaluation.html#metrics-optional\">help</a>",
                 "type": "array",
                 "propertyOrder": 30,
                 "items": {
@@ -1251,7 +1261,7 @@
                 }
               },
               "source": {
-                "title": "source",
+                "title": "source <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/evaluation.html#source-optional\">help</a>",
                 "type": "string",
                 "propertyOrder": 40,
                 "minLength": 1,
@@ -1298,7 +1308,7 @@
       "propertyOrder": 60,
       "properties": {
         "main_goal": {
-          "title": "main_goal",
+          "title": "main_goal <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/result.html#main-goal\">help</a>",
           "type": "string",
           "propertyOrder": 10,
           "minLength": 1,
@@ -1322,7 +1332,7 @@
           ]
         },
         "subgoals": {
-          "title": "subgoals",
+          "title": "subgoals <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/result.html#subgoals-optional\">help</a>",
           "propertyOrder": 20,
           "type": "array",
           "format": "table",
@@ -1331,7 +1341,7 @@
           }
         },
         "focus_main": {
-          "title": "focus_main",
+          "title": "focus_main <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/result.html#focus-main\">help</a>",
           "type": "string",
           "propertyOrder": 30,
           "minLength": 1,
@@ -1356,7 +1366,7 @@
           ]
         },
         "claimed_improvements": {
-          "title": "claimed_improvements",
+          "title": "claimed_improvements <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/result.html#claimed-improvements\">help</a>",
           "type": "array",
           "propertyOrder": 40,
           "format": "table",
@@ -1391,7 +1401,7 @@
           }
         },
         "reproducibility": {
-          "title": "reproducibility",
+          "title": "reproducibility <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/result.html#reproducibility-optional\">help</a>",
           "type": "string",
           "propertyOrder": 50,
           "minLength": 1,
