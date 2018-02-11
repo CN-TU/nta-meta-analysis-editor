@@ -1,0 +1,56 @@
+_pushedDataPackets, INSERT DESCRIPTION
+_client_to_server, Direction is Client to Server
+_server_to_client, Direction is Server to Client
+_source_to_destination, Direction is Source to Destination
+_destination_to_source, Direction is Destination to Source
+_interPacketTimeMicroseconds, Times between packets (in microseconds)
+_segmentSize, INSERT DESCRIPTION
+_transportHeaderLength, INSERT DESCRIPTION
+_push_pkts, INSERT DESCRIPTION
+_flowTotalCount, "Number of flows (in a flow aggregation, for example)"
+_transportPayloadLength, INSERT DESCRIPTION
+_durationSeconds, Duration of a flow aggregation in seconds (maybe we can use _flowDurationSeconds for this??)
+_icmpTotalCount, Number of ICMP packets
+_interPacketLengthVariation, INSERT DESCRIPTION
+_interFlowTimeSeconds, "Time between flows with the same key (in flow aggregations), in seconds"
+_flowStartHours, Hour in which the flow started
+_age, Age of a packet in seconds (maybe there's another way to get this?)
+_activeForSeconds, Number of bins of one second in which there was at least one packet
+_KDD_connectionFlag, KDD connection flag
+_KDD_land, KDD land
+_KDD_wrongFragment, KDD wrong fragment
+_KDD_urgent, KDD urgent
+_KDD_hot, KDD hot
+_KDD_numFailedLogins, KDD number of failed logins
+_KDD_loggedIn, KDD logged in
+_KDD_numCompromised, KDD number of compromised
+_KDD_rootShell, KDD root shell
+_KDD_suAttempted, KDD su attempted
+_KDD_numRoot, KDD number of root
+_KDD_numFileCreations, KDD number of file creations
+_KDD_numShells, KDD number of shells
+_KDD_numAccessFiles, KDD number of file accesses
+_KDD_numOutboundCmds, KDD number of outbound commands
+_KDD_isHotLogin, KDD is hot login
+_KDD_isGuestLogin, KDD is guest login
+_KDD_count, KDD count
+_KDD_srvCount, KDD server count
+_KDD_serrorRate, KDD send error rate
+_KDD_srvSerrorRate, KDD server send error rate
+_KDD_rerrorRate, KDD receive error rate
+_KDD_srvRerrorRate, KDD server receive error rate
+_KDD_sameSrvRate, KDD same server rate
+_KDD_diffSrvRate, KDD different server rate
+_KDD_srvDiffHostRate, KDD server different hosts rate
+_KDD_dstHostCount, KDD destination hosts count
+_KDD_dstHostSrvCount, KDD destination hosts server count
+_KDD_dstHostSameSrvRate, KDD destination hosts same server rate
+_KDD_dstHostDiffSrvRate, KDD destination hosts different server rate
+_KDD_dstHostSameSrcPortRate, KDD destination hosts same source port rate
+_KDD_dstHostSrvDiffHostRate, KDD destination hosts different host rate
+_KDD_dstHostSerrorRate, KDD destination host send error rate
+_KDD_dstHostSrvSerrorRate, KDD destination host server send error rate
+_KDD_dstHostRerrorRate, KDD destination host receive error rate
+_KDD_dstHostSrvRerrorRate, KDD destination host server receive error rate
+_ingressRouter, ""
+_egressRouter, ""
