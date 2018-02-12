@@ -2,11 +2,12 @@ const features = require('./features.js');
 define('ntarc-feature', function (require, exports, module) {
 
     var oop = require("ace/lib/oop");
+    var config = require("ace/config");
     var TextMode = require("ace/mode/text").Mode;
     var NTARCHighlightRules = require("ntarc_highlight_rules").NTARCHighlightRules;
     var competions = [];
-    
-    for(var key of features.specification.functions.keys()) {
+
+    for (var key of features.specification.functions.keys()) {
         competions.push({
             caption: key,
             snippet: key,
@@ -14,7 +15,7 @@ define('ntarc-feature', function (require, exports, module) {
             score: Number.MAX_VALUE
         })
     }
-    for(var i=0; i<features.own_ies.length; i++) {
+    for (var i = 0; i < features.own_ies.length; i++) {
         competions.push({
             caption: features.own_ies[i],
             snippet: features.own_ies[i],
@@ -22,7 +23,7 @@ define('ntarc-feature', function (require, exports, module) {
             score: Number.MAX_VALUE
         })
     }
-    for(var i=0; i<features.iana_ies.length; i++) {
+    for (var i = 0; i < features.iana_ies.length; i++) {
         competions.push({
             caption: features.iana_ies[i],
             snippet: features.iana_ies[i],
@@ -31,13 +32,80 @@ define('ntarc-feature', function (require, exports, module) {
         })
     }
 
+    var WorkerClient = require("ace/worker/worker_client").WorkerClient;
+
     var Mode = function () {
         this.HighlightRules = NTARCHighlightRules;
+        this.createWorker = function (session) {
+            MyWorkerClient = function(){
+                this.$sendDeltaQueue = this.$sendDeltaQueue.bind(this);
+                this.changeListener = this.changeListener.bind(this);
+                this.onMessage = this.onMessage.bind(this);
+
+                this.$worker = new Worker('worker-ntarc.js');
+
+                this.$worker.postMessage({
+                    init: true,
+                    tlns: undefined,
+                    module: "ntarc_worker",
+                    classname: "WorkerModule"
+                });
+
+                this.callbackId = 1;
+                this.callbacks = {};
+
+                this.$worker.onmessage = this.onMessage;
+            }
+            MyWorkerClient.prototype = WorkerClient.prototype;
+            var worker = new MyWorkerClient();
+            
+            var markers = new Map();
+
+            worker.attachToDocument(session.getDocument());
+
+            worker.on("lint", function (results) {
+                session._signal("ntarc", results.data.result);
+                session.setAnnotations(results.data.errors);
+                //let oldMarkers = new Set(markers.keys());
+                let markers = [];
+                for(let i=0;i<results.data.markers.length;i++) {
+                    let r = results.data.markers[i].range;
+                    markers.push({
+                        range : new Range(...r),
+                        type : "text",
+                        renderer: null,
+                        clazz : "ntarc_"+results.data.markers[i].type,
+                        inFront: false,
+                        id: i
+                    });                       
+/*                    let rs = r.join(",");
+                    if (!oldMarkers.has(r)) {
+                        markers.set(rs, session.addMarker(new Range(...r), "ntarc_"+results.data.markers[i].type, "text"));
+                    } else {
+                        oldMarkers.delete(rs);
+                    }*/
+                }
+                session.$backMarkers = markers;
+                session._signal("changeBackMarker");
+                /*
+                for(let marker of oldMarkers) {
+                    markers.delete(marker);
+                }
+                console.log(markers)
+                */
+            });
+
+            worker.on("terminate", function () {
+                session.clearAnnotations();
+            });
+
+            return worker;
+        };
     };
     oop.inherits(Mode, TextMode);
 
     (function () {
-        this.getCompletions = function(state, session, pos, prefix) {
+        this.getCompletions = function (state, session, pos, prefix) {
             return competions;
         }
     }).call(Mode.prototype);
@@ -64,7 +132,7 @@ define('ntarc_highlight_rules', function (require, exports, module) {
                     regex: "[()]"
                 },
                 {
-                    token: function(value) {
+                    token: function (value) {
                         if (value.startsWith('__')) {
                             return "comment";
                         }

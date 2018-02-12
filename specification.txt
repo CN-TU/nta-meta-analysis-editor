@@ -26,13 +26,13 @@
 <value> -> {"distinct": [<values>]}  # returns number of distinct values in <feature> in the selected objects
 <value> -> {"apply": [<feature>, <selection>]}  # returns a single feature value for the selection of objects
 <value> -> {"add": [<value>+]} | {"add": [<values>]}
-<values> -> {"add": [<value>, <values>]} | {"add": [<values>, <value>]}
+<values> -> {"add": [<value>, <values>]} | {"add": [<values>, <value>]} | {"add": [<values>+]}
 <value> -> {"subtract": [<value>, <value>]}
-<values> -> {"subtract": [<value>, <values>]} | {"subtract": [<values>, <value>]}
+<values> -> {"subtract": [<value>, <values>]} | {"subtract": [<values>, <value>]} | {"subtract": [<values>, <values>]}
 <value> -> {"multiply": [<value>+]} | {"multiply": [<values>]}
-<values> -> {"multiply": [<value>, <values>]} | {"multiply": [<values>, <value>]}
+<values> -> {"multiply": [<value>, <values>]} | {"multiply": [<values>, <value>]} | {"multiply": [<values+>]}
 <value> -> {"divide": [<value>, <value>]}
-<values> -> {"divide": [<value>, <values>]} | {"divide": [<values>, <value>]}
+<values> -> {"divide": [<value>, <values>]} | {"divide": [<values>, <value>]} | {"divide": [<values>, <values>]}
 <value> -> {"log": [<value>]}
 <values> -> {"log": [<values>]}
 <value> -> {"exp": [<value>]}

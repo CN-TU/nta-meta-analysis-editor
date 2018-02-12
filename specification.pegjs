@@ -1,41 +1,4 @@
 {
-  function compare_arg(a, b) {
-    if (a == b) return true;
-    if (b == "<anything>") return true;
-    if (b == "<feature>" && (a == "<value>" || a == "<values>")) return true;
-    return false;
-  }
-  function compare_args(a, b, oneormore) {
-    if (a == b) {
-      return true;
-    }
-    if(oneormore) {
-      for(let i=0; i< b.length; i++) {
-        if (!compare_arg(a, b[i])) {
-          return false;
-        }
-      }
-    } else {
-      for(let i=0; i< a.length; i++) {
-        if (!compare_arg(a[i], b[i])) {
-          return false;
-        }
-      }
-    }
-    return true;
-  }
-  function args2text(args) {
-    let ret = [];
-    if (args[0] !== undefined) {
-      ret.push("<value>+")
-    }
-    for(let i=1; i<args.length; i++) {
-      if (args[i] !== undefined) {
-        ret.push(args[i][0].join(","));
-      }
-    }
-    return ret.join(" or ");
-  }
   function defChecker() {
     this.functions = new Map();
     this.verbs = new Map();
@@ -47,62 +10,68 @@
         args = args[0].term;
       }
       if (this.functions.has(name)) {
-        this.functions.get(name)[id] = [args, ret];
+        if (this.functions.get(name)[id] !== undefined) {
+          this.functions.get(name)[id].push([args,ret]);
+        } else {
+          this.functions.get(name)[id] = [[args, ret]];
+        }
       } else {
         let arr = []
-        arr[id] = [args, ret];
+        arr[id] = [[args, ret]];
         this.functions.set(name, arr);
       }
     }
     this.addVerb = function(name, ret) {
       this.verbs.set(name, ret);
     }
-    this.check = function(item, args, err) {
-      let ret;
+    this.arguments = function(item, want, err) {
       switch(item.type) {
         case "feature":
-          if (item.name.startsWith('__')) {
-            return "<feature>";
-          }
-          if (item.name.startsWith('_')) {
-            //check feature
-            return "<feature>";
-          }
-          ret = this.verbs.get(item.name);
-          if (ret !== undefined) {
-            return ret;
-          }
-          //check feature
-          return "<feature>";
         case "number":
-          return this.verbs.get("<free-float>");
         case "boolean":
-          return this.verbs.get("<boolean>");
+          return null;
         case "function":
           if (item.name.startsWith('__')) {
-            return "<value>";
+            return "<anything>";
           }
           if (item.name.startsWith('_')) {
-            //check feature
-            return "<value>";
+            return "<anything>";
           }
-          ret = this.functions.get(item.name);
-          if (ret === undefined) {
+          let variants = this.functions.get(item.name);
+          if (variants === undefined) {
             item.error = "Function not found";
             err.push(item);
             return "<anything>";
           }
-          let n = args.length;
-          if (ret[n] !== undefined && compare_args(ret[n][0], args)) {
-            return ret[n][1];
+          let n = item.args.length;
+          let ret = [];
+          if (variants[n] !== undefined) {
+            for(let i=0; i<variants[n].length; i++) {
+              if (want == undefined || variants[n][i][1] == want) {
+                ret.push(variants[n][i])
+              }
+            }
           }
-          if (ret[0] !== undefined && compare_args(ret[0][0], args, true)) {
-            return ret[0][1];
+          if (variants[0] !== undefined) {
+            for(let i=0; i<variants[0].length; i++) {
+              if (want == undefined || variants[0][i][1] == want) {
+                ret.push([Array(n).fill(variants[0][i][0]), variants[0][i][1]])
+              }
+            }
           }
-          item.error = "Wrong arguments. Got "+args.join(",")+"; Available variant(s): "+args2text(ret);
-          err.push(item);
-          return "<anything>";
+          return ret;
       }
+    }
+    this.isValid = function(item, want) {
+      switch(item.type) {
+        case "feature":
+          return want == "<value>" || want == "<values>" || want == "<anything>"
+        case "number":
+          return want == "<value>" || want == "<anything>"
+        case "boolean":
+          return want == "<logic>" || want == "<anything>"
+      }
+      return false;
     }
   }
 

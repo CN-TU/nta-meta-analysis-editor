@@ -122,6 +122,11 @@ exports.text2feature = function(input, errors) {
     if (ret === null) {
         return ret;
     }
-    ret.check(errors);
+    let err = ret.check(errors);
+    if (err !== true)
+//        errors.push(err[0]);
+        for(let i=0; i<err.length; i++) {
+            errors.push(err[i]);
+        }
     return ret.cleanup();
 }

@@ -786,7 +786,7 @@ function peg$parse(input, options) {
   }
 
   function peg$parseFeature() {
-    var s0, s1, s2, s3, s4, s5, s6;
+    var s0, s1, s2, s3, s4, s5, s6, s7;
 
     s0 = peg$currPos;
     s1 = peg$parse_();
@@ -828,17 +828,23 @@ function peg$parse(input, options) {
             if (s4 !== peg$FAILED) {
               s5 = peg$parseArguments();
               if (s5 !== peg$FAILED) {
-                if (input.charCodeAt(peg$currPos) === 41) {
-                  s6 = peg$c27;
-                  peg$currPos++;
-                } else {
-                  s6 = peg$FAILED;
-                  if (peg$silentFails === 0) { peg$fail(peg$c28); }
-                }
+                s6 = peg$parse_();
                 if (s6 !== peg$FAILED) {
-                  peg$savedPos = s0;
-                  s1 = peg$c31(s2, s5);
-                  s0 = s1;
+                  if (input.charCodeAt(peg$currPos) === 41) {
+                    s7 = peg$c27;
+                    peg$currPos++;
+                  } else {
+                    s7 = peg$FAILED;
+                    if (peg$silentFails === 0) { peg$fail(peg$c28); }
+                  }
+                  if (s7 !== peg$FAILED) {
+                    peg$savedPos = s0;
+                    s1 = peg$c31(s2, s5);
+                    s0 = s1;
+                  } else {
+                    peg$currPos = s0;
+                    s0 = peg$FAILED;
+                  }
                 } else {
                   peg$currPos = s0;
                   s0 = peg$FAILED;
@@ -1229,11 +1235,59 @@ function peg$parse(input, options) {
                   return this.name;
           }
       }
-      this.check = function (err) {
-          let subtype = null;
-          if (this.args !== null)
-              subtype = this.args.map(function (value) { return value.check(err); })
-          return options.specification.check(this, subtype, err);
+
+      this.check = function (specerror, want) {
+        let errors = []
+        if (this.args === null) {
+          if (want === undefined || options.specification.isValid(this, want))
+            return true;
+          let type = "<???>";
+          switch(this.type) {
+            case "number":
+            case "boolean":
+              type = "<value>";
+              break;
+            case "feature":
+              type = "<feature>";
+              break;
+          }
+          this.error = "Wanted "+want+", but "+this.name+" is "+type;
+          return [this];
+        } else {
+          let variants = options.specification.arguments(this, want, specerror);
+          if (variants.length == 0) {
+            variants = options.specification.arguments(this);
+            this.error = "Wanted "+want+", but "+this.name+" is "+variants.map(function(variant) { return variant[1]}).join(" or ");
+            return [this];
+          }
+          let overall = false;
+          for(let i=0; i<variants.length; i++) {
+            let result = true;
+            for(let j=0; j<variants[i][0].length; j++) {
+              let error = this.args[j].check(specerror, variants[i][0][j])
+              if(error !== true) {
+                errors = errors.concat(error);
+                result = false;
+                break;
+              }
+            }
+            if(result) {
+              overall = true;
+            }
+          }
+          if (!overall) {
+            let tmp = " returning "+want;
+            if (want === undefined)
+              tmp = "";
+            let tmp2 = variants;
+            if (typeof variants !== "string") 
+              tmp2 = variants.map(function(variant) { return variant[0].join(",");}).join(" or ")
+            this.error = "Wrong arguments to '"+this.name+"'"+tmp+ "; Possible Arguments: "+tmp2;
+            errors.push(this);
+            return errors; //cascade up
+          }
+          return true;
+        }
       }
     }
 
