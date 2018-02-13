@@ -43,7 +43,7 @@ function feature(element) {
     this.render = function () {
         return "" + this.element;
     }
-    this.simplify = function () { };
+    this.simplify = function () { return this; };
 }
 
 function fun(op, args) {
