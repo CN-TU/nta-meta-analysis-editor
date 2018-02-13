@@ -12,7 +12,7 @@ define('ntarc-feature', function (require, exports, module) {
             caption: key,
             snippet: key,
             meta: "functions",
-            score: Number.MAX_VALUE
+            score: 100000
         })
     }
     for (var i = 0; i < features.own_ies.length; i++) {
@@ -20,7 +20,7 @@ define('ntarc-feature', function (require, exports, module) {
             caption: features.own_ies[i],
             snippet: features.own_ies[i],
             meta: "custom",
-            score: Number.MAX_VALUE
+            score: 1000
         })
     }
     for (var i = 0; i < features.iana_ies.length; i++) {
@@ -28,7 +28,7 @@ define('ntarc-feature', function (require, exports, module) {
             caption: features.iana_ies[i],
             snippet: features.iana_ies[i],
             meta: "iana",
-            score: Number.MAX_VALUE
+            score: 10000
         })
     }
 
@@ -66,7 +66,6 @@ define('ntarc-feature', function (require, exports, module) {
             worker.on("lint", function (results) {
                 session._signal("ntarc", results.data.result);
                 session.setAnnotations(results.data.errors);
-                //let oldMarkers = new Set(markers.keys());
                 let markers = [];
                 for(let i=0;i<results.data.markers.length;i++) {
                     let r = results.data.markers[i].range;
@@ -77,22 +76,10 @@ define('ntarc-feature', function (require, exports, module) {
                         clazz : "ntarc_"+results.data.markers[i].type,
                         inFront: false,
                         id: i
-                    });                       
-/*                    let rs = r.join(",");
-                    if (!oldMarkers.has(r)) {
-                        markers.set(rs, session.addMarker(new Range(...r), "ntarc_"+results.data.markers[i].type, "text"));
-                    } else {
-                        oldMarkers.delete(rs);
-                    }*/
+                    });
                 }
                 session.$backMarkers = markers;
                 session._signal("changeBackMarker");
-                /*
-                for(let marker of oldMarkers) {
-                    markers.delete(marker);
-                }
-                console.log(markers)
-                */
             });
 
             worker.on("terminate", function () {
