@@ -5,10 +5,10 @@ define('ntarc-feature', function (require, exports, module) {
     var config = require("ace/config");
     var TextMode = require("ace/mode/text").Mode;
     var NTARCHighlightRules = require("ntarc_highlight_rules").NTARCHighlightRules;
-    var competions = [];
+    var completions = [];
 
     for (var key of features.specification.functions.keys()) {
-        competions.push({
+        completions.push({
             caption: key,
             snippet: key,
             meta: "functions",
@@ -16,7 +16,7 @@ define('ntarc-feature', function (require, exports, module) {
         })
     }
     for (var i = 0; i < features.own_ies.length; i++) {
-        competions.push({
+        completions.push({
             caption: features.own_ies[i],
             snippet: features.own_ies[i],
             meta: "custom",
@@ -24,7 +24,7 @@ define('ntarc-feature', function (require, exports, module) {
         })
     }
     for (var i = 0; i < features.iana_ies.length; i++) {
-        competions.push({
+        completions.push({
             caption: features.iana_ies[i],
             snippet: features.iana_ies[i],
             meta: "iana",
@@ -93,7 +93,7 @@ define('ntarc-feature', function (require, exports, module) {
 
     (function () {
         this.getCompletions = function (state, session, pos, prefix) {
-            return competions;
+            return completions;
         }
     }).call(Mode.prototype);
 
