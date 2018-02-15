@@ -26,7 +26,7 @@ function ParseWarning(msg, item) {
     }
 }
 
-const iana_ies = exports.iana_ies = csv(fs.readFileSync("iana_ies.csv"), { columns: true }).map(
+const iana_ies = new Set(exports.iana_ies = csv(fs.readFileSync("iana_ies.csv"), { columns: true }).map(
     function (row) {
         return row.Name;
     }
@@ -38,12 +38,12 @@ const iana_ies = exports.iana_ies = csv(fs.readFileSync("iana_ies.csv"), { colum
             !row.startsWith('Assigned'))
             return true;
     }
-).sort();
-const own_ies = exports.own_ies = csv(fs.readFileSync("own_ies.csv"), { trim: true }).map(
+));
+const own_ies = exports.own_ies = new Set(csv(fs.readFileSync("own_ies.csv"), { trim: true }).map(
     function (row) {
         return row[0];
     }
-).sort();
+));
 const feature_aliases = exports.feature_aliases = JSON.parse(fs.readFileSync("feature_aliases.json").toString());
 
 

@@ -1459,6 +1459,9 @@ function peg$parse(input, options) {
           this.functions.set(name, arr);
         }
       }
+      this.validCustomName = function(name) {
+        return /^__[a-z0-9]+([A-Z][a-z0-9]*)*$/.test(name);
+      }
       this.addVerb = function(name, ret) {
         if (name.startsWith('<')) {
           if (this.verbs.has(name)) {
@@ -1480,6 +1483,8 @@ function peg$parse(input, options) {
             let hints = [];
             let n = item.args.length;
             if (item.name.startsWith('__')) {
+              if (!this.validCustomName(item.name))
+                err.push(new ParseWarning("Illegal custom name '"+item.name+"'. Must start with a lowercase letter and be camelcase.", item));
               return {variants:[new ComputedVariant(new Variant(Array(n).fill(ANYTHING), ANYTHING), context)]};
             }
             let variants = this.functions.get(item.name);

@@ -1302,6 +1302,7 @@ function peg$parse(input, options) {
     var iana_ies = options.iana_ies;
     var own_ies = options.own_ies;
     var feature_aliases = options.feature_aliases;
+    var specification = options.specification;
     var MATHBACK = {};
     for(var key in options.MATH){
       MATHBACK[options.MATH[key]] = key;
@@ -1351,18 +1352,30 @@ function peg$parse(input, options) {
           feature = this;
         else
           feature = createFakeFeature(this, feature);
-        // check name here
         if (feature.args === null) {
+          let warnings = []
+          if(feature.type == "feature") {
+            if(feature.name.startsWith('__')) {
+              if(!specification.validCustomName(feature.name))
+                specerror.push(new ParseWarning("Illegal custom name '"+feature.name+"'. Must start with a lowercase letter and be camel case.", feature));
+            } else if(feature.name.startsWith('_')) {
+              if(!own_ies.has(feature.name))
+                specerror.push(new ParseWarning("Unknown feature '"+feature.name+"'. Must be part of 'own_ies.csv'.", feature));
+            } else {
+              if(!iana_ies.has(feature.name) && !specification.spec_features.has(feature.name))
+                specerror.push(new ParseWarning("Unknown feature '"+feature.name+"'. Must be part of iana.", feature));
+            }
+          }
           if (want === undefined)
             return true;
-          let {ok, hint} = options.specification.isValid(feature, want, context);
+          let {ok, hint} = specification.isValid(feature, want, context);
           if (ok)
             return true;
-          return [new ParseWarning("Wanted "+want+", but '"+feature.name+"' is "+options.specification.type(feature)+"."+(hint.length > 0 ? [""].concat(hint).join(" ") : ""), feature)];
+          return [new ParseWarning("Wanted "+want+", but '"+feature.name+"' is "+specification.type(feature)+"."+(hint.length > 0 ? [""].concat(hint).join(" ") : ""), feature)];
         } else {
-          let {variants, hints} = options.specification.arguments(feature, want, specerror, context);
+          let {variants, hints} = specification.arguments(feature, want, specerror, context);
           if (variants.length == 0) {
-            variants = options.specification.arguments(feature).variants;
+            variants = specification.arguments(feature).variants;
             return [new ParseWarning("Wanted "+want+", but '"+feature.name+"' is "+variants.map(function(variant) {return variant.ret}).join(" or ")+"."+(hints.length > 0 ? [""].concat(hints).join(" ") : ""), feature)];
           }
           let overall = false;
