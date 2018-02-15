@@ -1,4 +1,4 @@
-const {text2feature} = require('./features.js');
+const {text2feature} = require('./features.js')('.');
 
 const readline = require('readline');
 const rl = readline.createInterface({

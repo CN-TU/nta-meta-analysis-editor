@@ -1,4 +1,4 @@
-const features = require('./features.js');
+const features = require('./features.js')('.');
 ace.define('ntarc-feature', function (require, exports, module) {
 
     var oop = require("ace/lib/oop");
@@ -16,18 +16,18 @@ ace.define('ntarc-feature', function (require, exports, module) {
             score: 100000
         })
     }
-    for (var i = 0; i < features.own_ies.length; i++) {
+    for (var feature of features.own_ies) {
         completions.push({
-            caption: features.own_ies[i],
-            snippet: features.own_ies[i],
+            caption: feature,
+            snippet: feature,
             meta: "custom",
             score: 1000
         })
     }
-    for (var i = 0; i < features.iana_ies.length; i++) {
+    for (var feature of features.iana_ies) {
         completions.push({
-            caption: features.iana_ies[i],
-            snippet: features.iana_ies[i],
+            caption: feature,
+            snippet: feature,
             meta: "iana",
             score: 10000
         })

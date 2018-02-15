@@ -1,4 +1,4 @@
-const { feature2text, text2feature } = require('./features.js');
+const { feature2text, text2feature } = require('./features.js')('.');
 importScripts('./worker.js');
 require('node_modules/ace-builds/src-noconflict/ace');
 

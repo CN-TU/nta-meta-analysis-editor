@@ -1,3 +1,4 @@
+const path = require('path');
 const fs = require('fs');
 const csv = require('csv-parse/lib/sync');
 
@@ -26,29 +27,6 @@ function ParseWarning(msg, item) {
     }
 }
 
-const iana_ies = new Set(exports.iana_ies = csv(fs.readFileSync("iana_ies.csv"), { columns: true }).map(
-    function (row) {
-        return row.Name;
-    }
-).filter(
-    function (row) {
-        if (row != "" &&
-            row != "Reserved" &&
-            row != "Unassigned" &&
-            !row.startsWith('Assigned'))
-            return true;
-    }
-).sort());
-const own_ies = exports.own_ies = new Set(csv(fs.readFileSync("own_ies.csv"), { trim: true }).map(
-    function (row) {
-        return row[0];
-    }
-).sort());
-const feature_aliases = JSON.parse(fs.readFileSync("feature_aliases.json").toString());
-exports.feature_aliases = Object.keys(feature_aliases).sort()
-
-const specification = exports.specification = require('./specification.js').parse(fs.readFileSync('specification.txt').toString(), { ParseWarning: ParseWarning });
-
 function feature(element) {
     this.brace = false;
     this.element = element;
@@ -57,7 +35,6 @@ function feature(element) {
     }
     this.simplify = function () { return this; };
 }
-
 function fun(op, args) {
     this.brace = false;
     this.op = op;
@@ -127,28 +104,56 @@ function feature2text(input) {
     }
 }
 
-exports.feature2text = function (input) {
-    return feature2text(input).simplify().render();
-}
+module.exports = function(base_path) {
+    var module = {};
 
-const featureParser = require('./feature.js');
-
-exports.text2feature = function (input, errors, context) {
-    let ret = featureParser.parse(input, {
-        MATH: MATH,
-        specification: specification,
-        ParseWarning: ParseWarning,
-        iana_ies: iana_ies,
-        own_ies: own_ies,
-        feature_aliases: feature_aliases
-    });
-    if (ret === null) {
-        return ret;
-    }
-    let err = ret.check(errors, specification.BASE, context);
-    if (err !== true)
-        for (let error of err) {
-            errors.push(error);
+    module.iana_ies = new Set(csv(fs.readFileSync(path.join(base_path, "iana_ies.csv")), { columns: true }).map(
+        function (row) {
+            return row.Name;
         }
-    return ret.cleanup();
+    ).filter(
+        function (row) {
+            if (row != "" &&
+                row != "Reserved" &&
+                row != "Unassigned" &&
+                !row.startsWith('Assigned'))
+                return true;
+        }
+    ));
+    module.own_ies = new Set(csv(fs.readFileSync(path.join(base_path, "own_ies.csv")), { trim: true }).map(
+        function (row) {
+            return row[0];
+        }
+    ));
+    const feature_aliases = JSON.parse(fs.readFileSync(path.join(base_path, "feature_aliases.json")).toString());
+    module.feature_aliases = Object.keys(feature_aliases)
+
+    const specification = module.specification = require('./specification.js').parse(fs.readFileSync(path.join(base_path, 'specification.txt')).toString(), { ParseWarning: ParseWarning });
+
+    module.feature2text = function (input) {
+        return feature2text(input).simplify().render();
+    }
+
+    const featureParser = require('./feature.js');
+
+    module.text2feature = function (input, errors, context) {
+        let ret = featureParser.parse(input, {
+            MATH: MATH,
+            specification: specification,
+            ParseWarning: ParseWarning,
+            iana_ies: module.iana_ies,
+            own_ies: module.own_ies,
+            feature_aliases: feature_aliases
+        });
+        if (ret === null) {
+            return ret;
+        }
+        let err = ret.check(errors, specification.BASE, context);
+        if (err !== true)
+            for (let error of err) {
+                errors.push(error);
+            }
+        return ret.cleanup();
+    }
+    return module;
 }
