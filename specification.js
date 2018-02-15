@@ -1544,21 +1544,19 @@ function peg$parse(input, options) {
             let ret = this.compareVerbs(newa, want, context)
             if (ret.ok)
               return ret;
-            hint.push(ret.hint);
+            hint = hint.concat(ret.hint);
           }
         }
         if(a == "<value>") {
           let d2ok = down2(context);
-          if(d2ok === false) {
-          } else {
+          if(d2ok !== false) {
             let ret = this.compareVerbs("<down2>", want, d2ok)
             if (ret.ok)
               return ret;
             hint.push(ret.hint);
           }
           let dok = down(context);
-          if(dok === false) {
-          } else {
+          if(dok !== false) {
             let ret = this.compareVerbs("<down>", want, dok)
             if (ret.ok) {
               return ret;

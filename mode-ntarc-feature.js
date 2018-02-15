@@ -4,6 +4,7 @@ define('ntarc-feature', function (require, exports, module) {
     var oop = require("ace/lib/oop");
     var config = require("ace/config");
     var TextMode = require("ace/mode/text").Mode;
+    var Range = require('ace/range').Range;
     var NTARCHighlightRules = require("ntarc_highlight_rules").NTARCHighlightRules;
     var completions = [];
 
@@ -60,11 +61,11 @@ define('ntarc-feature', function (require, exports, module) {
             var worker = new MyWorkerClient();
             
             var markers = new Map();
+            worker.emit("setContext", {data: session.$ntarc_context});
 
             worker.attachToDocument(session.getDocument());
 
             worker.on("lint", function (results) {
-                session._signal("ntarc", results.data.result);
                 session.setAnnotations(results.data.errors);
                 let markers = [];
                 for(let i=0;i<results.data.markers.length;i++) {

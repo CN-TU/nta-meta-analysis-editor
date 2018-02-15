@@ -14,21 +14,24 @@
     </head>
     <body>
         <div id="input" style="height: 200px">count(quantile_range(octetTotalCount / _flowDurationSeconds, 0.05, 0.1));</div><br>
-        <textarea id="result"rows=30 cols=100></textarea>
         <script>
           require('ace-builds/src/ace');
           require("ace-builds/src/ext-language_tools");
           var result = document.getElementById("result");
-          var editor = ace.edit("input", {mode: 'ntarc-feature'});
-          editor.getSession().on("ntarc", function(e) {
-            result.value = e;
-          });
+          var editor = ace.edit("input");
           editor.setOptions({
             enableBasicAutocompletion: true,
             enableLiveAutocompletion: true
           });
           editor.setShowPrintMargin(false);
-          var Range = require('ace/range').Range;
+
+          var EditSession = require('ace/edit_session').EditSession;
+
+          var textSession = new EditSession("");
+          textSession.$ntarc_context = "flows";
+          textSession.setMode('ntarc-feature');
+
+          editor.setSession(textSession);
 
           const {feature2text, text2feature} = require('./features.js');
       </script>

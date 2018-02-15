@@ -69,8 +69,12 @@ define("ntarc_worker", function (require, exports, module) {
 
     var oop = require("ace/lib/oop");
     var Mirror = require("ace/worker/mirror").Mirror;
+    var context;
 
     var WorkerModule = exports.WorkerModule = function (sender) {
+        sender.on("setContext", function(e) {
+            context = e.data;
+        });
         Mirror.call(this, sender);
         this.setTimeout(500);
     };
@@ -85,18 +89,13 @@ define("ntarc_worker", function (require, exports, module) {
             let current_column = 0;
             let markers = [];
             let errors = [];
-            let obj = [];
             for (let i = 0; i < features.length; i++) {
                 let current_warnings = [];
                 let lines = features[i].split('\n');
                 let next_line = lines.length - 1;
                 let next_column = lines[lines.length - 1].length;
-                let feature = null;
                 try {
-                    feature = text2feature(features[i], current_warnings);
-                    if (feature != null) {
-                        obj.push(feature);
-                    }
+                    text2feature(features[i], current_warnings, context);
                     for(let j=0; j<current_warnings.length; j++) {
                         let error = {
                             row: current_warnings[j].location.start.line - 1 + current_line,
@@ -107,7 +106,7 @@ define("ntarc_worker", function (require, exports, module) {
                                 current_warnings[j].location.end.line - 1 + current_line,
                                 current_warnings[j].location.end.column - 1 + (current_warnings[j].location.end.line == 1 ? current_column : 0),
                             ],
-                            text: current_warnings[j].error,
+                            text: current_warnings[j].msg,
                             type: "warning"
                         }
                         errors.push(error);
@@ -136,10 +135,7 @@ define("ntarc_worker", function (require, exports, module) {
                     current_column = next_column;
                 }
             }
-            let result = JSON.stringify(obj, null, 2);
-
             this.sender.emit("lint", {
-                result: result,
                 errors: errors,
                 markers: markers
             });
