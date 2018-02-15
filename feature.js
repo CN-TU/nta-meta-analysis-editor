@@ -176,7 +176,7 @@ function peg$parse(input, options) {
       peg$c28 = peg$literalExpectation(")", false),
       peg$c29 = function(id) { return id; },
       peg$c30 = function(c) { return c; },
-      peg$c31 = function(id, args) { return new parsedFeature(id, args, "function", location());},
+      peg$c31 = function(id, args) { return new parsedFeature(id, args, "operation", location());},
       peg$c32 = function(id) { return new parsedFeature(id, null, "feature", location()); },
       peg$c33 = ",",
       peg$c34 = peg$literalExpectation(",", false),
@@ -1304,7 +1304,7 @@ function peg$parse(input, options) {
       MATHBACK[options.MATH[key]] = key;
     }
   	function toMath(op, args) {
-        return new parsedFeature(MATHBACK[op], args, "function", location());
+        return new parsedFeature(MATHBACK[op], args, "operation", location());
     }
     function parsedFeature(name, args, type, location) {
       this.type = type
@@ -1314,7 +1314,7 @@ function peg$parse(input, options) {
       this.error = null;
       this.cleanup = function () {
           switch (this.type) {
-              case "function":
+              case "operation":
                   let ret = {};
                   ret[this.name] = this.args.map(function (value) { return value.cleanup(); });
                   return ret;

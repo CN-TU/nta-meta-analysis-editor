@@ -1430,7 +1430,7 @@ function peg$parse(input, options) {
           case "number":
           case "boolean":
             return null;
-          case "function":
+          case "operation":
             if (item.name.startsWith('__')) {
               return "<anything>";
             }

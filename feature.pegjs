@@ -4,7 +4,7 @@
     MATHBACK[options.MATH[key]] = key;
   }
 	function toMath(op, args) {
-      return new parsedFeature(MATHBACK[op], args, "function", location());
+      return new parsedFeature(MATHBACK[op], args, "operation", location());
   }
   function parsedFeature(name, args, type, location) {
     this.type = type
@@ -14,7 +14,7 @@
     this.error = null;
     this.cleanup = function () {
         switch (this.type) {
-            case "function":
+            case "operation":
                 let ret = {};
                 ret[this.name] = this.args.map(function (value) { return value.cleanup(); });
                 return ret;
@@ -117,7 +117,7 @@ Level3
 
 Feature
    = _ c:Const _ { return c; } /
-     _ id:Identifier _ '(' args:Arguments _ ')' { return new parsedFeature(id, args, "function", location());} /
+     _ id:Identifier _ '(' args:Arguments _ ')' { return new parsedFeature(id, args, "operation", location());} /
      _ id:Identifier _ { return new parsedFeature(id, null, "feature", location()); }
 
 Arguments =
