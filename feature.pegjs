@@ -31,7 +31,7 @@
         let {ok, hint} = options.specification.isValid(this, want, context);
         if (ok)
           return true;
-        return [new ParseWarning("Wanted "+want+", but "+this.name+" is "+options.specification.type(this)+(hint !== undefined ? ". "+hint : ""), this)];
+        return [new ParseWarning("Wanted "+want+", but "+this.name+" is "+options.specification.type(this)+"."+(hint.length > 0 ? [""].concat(hint).join(" ") : ""), this)];
       } else {
         let variants = options.specification.arguments(this, want, specerror, context);
         if (variants.length == 0) {

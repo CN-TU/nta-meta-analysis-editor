@@ -1407,7 +1407,7 @@ function peg$parse(input, options) {
     function VerbCheck(ret, context, hint) {
       this.ok = ret;
       this.newcontext = context;
-      this.hint = hint;
+      this.hint = hint || [];
     }
     function down(context) {
         switch(context) {
@@ -1506,13 +1506,13 @@ function peg$parse(input, options) {
       this.compareVerbs = function(a, want, context) {
         if (want == ANYTHING) return new VerbCheck(true, context);
         if (a == want) return new VerbCheck(true, context);
-        let hint = undefined;
+        let hint = [];
         if (this.verbs.has(a)) {
           for(let newa of this.verbs.get(a)) {
             let ret = this.compareVerbs(newa, want, context)
             if (ret.ok)
               return ret;
-            hint = ret.hint;
+            hint.push(ret.hint);
           }
         }
         if(a == "<value>") {
@@ -1522,7 +1522,7 @@ function peg$parse(input, options) {
             let ret = this.compareVerbs("<down2>", want, d2ok)
             if (ret.ok)
               return ret;
-            hint = ret.hint;
+            hint.push(ret.hint);
           }
           let dok = down(context);
           if(dok === false) {
@@ -1531,15 +1531,15 @@ function peg$parse(input, options) {
             if (ret.ok) {
               return ret;
             }
-            hint = ret.hint;
+            hint.push(ret.hint);
           }
           switch(want) {
             case "<down2>":
-              hint = "Only possible in 'flow_aggregations', but at this point context is '"+context+"'.";
+              hint.push("Only possible in 'flow_aggregations', but at this point context is '"+context+"'.");
               break;
             case "<down>":
             case "<values>":
-              hint = "Only possible in 'flow_aggregations' or 'flows', but at this point context is '"+context+"'.";
+              hint.push("Only possible in 'flow_aggregations' or 'flows', but at this point context is '"+context+"'.");
               break;
           }
         }
