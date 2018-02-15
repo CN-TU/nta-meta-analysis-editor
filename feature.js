@@ -1336,13 +1336,13 @@ function peg$parse(input, options) {
           let variants = options.specification.arguments(this, want, specerror, context);
           if (variants.length == 0) {
             variants = options.specification.arguments(this);
-            return [new ParseWarning("Wanted "+want+", but "+this.name+" is "+variants.map(function(variant) { return variant[1]}).join(" or "), this)];
+            return [new ParseWarning("Wanted "+want+", but "+this.name+" is "+variants.map(function(variant) {return variant.ret}).join(" or "), this)];
           }
           let overall = false;
-          for(let i=0; i<variants.length; i++) {
+          for(let variant of variants) {
             let result = true;
-            for(let j=0; j<variants[i][0].length; j++) {
-              let error = this.args[j].check(specerror, variants[i][0][j], variants[i][2])
+            for(let i=0; i<variant.args.length; i++) {
+              let error = this.args[i].check(specerror, variant.args[i], variant.context)
               if(error !== true) {
                 errors = errors.concat(error);
                 result = false;
@@ -1359,7 +1359,7 @@ function peg$parse(input, options) {
               tmp = "";
             let tmp2 = variants;
             if (typeof variants === "object")
-              tmp2 = variants.map(function(variant) { return variant[0].join(",");}).join(" or ");
+              tmp2 = variants.map(function(variant) { return variant.args.join(",");}).join(" or ");
             errors.push(new ParseWarning("Wrong arguments to '"+this.name+"'"+tmp+ "; Possible Arguments: "+tmp2, this));
             return errors; //cascade up
           }

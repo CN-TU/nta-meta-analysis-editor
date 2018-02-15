@@ -136,9 +136,8 @@ exports.text2feature = function (input, errors, context) {
     }
     let err = ret.check(errors, specification.BASE, context);
     if (err !== true)
-        //        errors.push(err[0]);
-        for (let i = 0; i < err.length; i++) {
-            errors.push(err[i]);
+        for (let error of err) {
+            errors.push(error);
         }
     return ret.cleanup();
 }

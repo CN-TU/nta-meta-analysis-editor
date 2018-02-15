@@ -9,6 +9,16 @@
     this.newcontext = context;
     this.hint = hint || [];
   }
+  function Variant(args, ret) {
+    this.args = args;
+    this.ret = ret;
+  }
+  function ComputedVariant(variant, context, hint) {
+    this.args = variant.args;
+    this.ret = variant.ret;
+    this.context = context;
+    this.hint = hint || [];
+  }
   function down(context) {
       switch(context) {
         case "flows":
@@ -36,15 +46,16 @@
         id = 0;
         args[args.length - 1] = args[args.length - 1].term;
       }
+      let variant = new Variant(args,ret)
       if (this.functions.has(name)) {
         if (this.functions.get(name)[id] !== undefined) {
-          this.functions.get(name)[id].push([args,ret]);
+          this.functions.get(name)[id].push(variant);
         } else {
-          this.functions.get(name)[id] = [[args, ret]];
+          this.functions.get(name)[id] = [variant];
         }
       } else {
         let arr = []
-        arr[id] = [[args, ret]];
+        arr[id] = [variant];
         this.functions.set(name, arr);
       }
     }
@@ -68,37 +79,41 @@
         case "operation":
           let n = item.args.length;
           if (item.name.startsWith('__')) {
-            return [[Array(n).fill(ANYTHING), ANYTHING, context, undefined]];
+            return [new ComputedVariant(new Variant(Array(n).fill(ANYTHING), ANYTHING), context)];
           }
           let variants = this.functions.get(item.name);
           if (variants === undefined) {
             err.push(new ParseWarning("Operation '"+item.name+"' not found", item));
-            return [[Array(n).fill(ANYTHING), ANYTHING, context, undefined]];
+            let hint = [];
+            if (item.name == "basedon") {
+              hint.push("'basedon' was removed from the spec. Have a look at 'apply'.");
+            }
+            return [new ComputedVariant(new Variant(Array(n).fill(ANYTHING), ANYTHING), context, hint)];
           }
           let ret = [];
           if (variants[n] !== undefined) {
-            for(let i=0; i<variants[n].length; i++) {
+            for(let variant of variants[n]) {
               if (want == undefined) {
-                ret.push(variants[n][i].concat(context));
+                ret.push(new ComputedVariant(variant, context));
               } else {
-                 let {ok, newcontext, hint} = this.compareVerbs(variants[n][i][1], want, context);
+                 let {ok, newcontext, hint} = this.compareVerbs(variant.ret, want, context);
                  if(ok) {
-                   ret.push(variants[n][i].concat(newcontext, hint));
+                   ret.push(new ComputedVariant(variant, newcontext, hint));
                  }
               }
             }
           }
           if (variants[0] !== undefined) {
-            for(let i=0; i<variants[0].length; i++) {
-              if (n >= variants[0][i][0].length) {
-                let v = variants[0][i][0].slice(0,-1);
-                v = v.concat(Array(n-variants[0][i][0].length+1).fill(variants[0][i][0][variants[0][i][0].length - 1]));
+            for(let variant of variants[0]) {
+              if (n >= variant.args.length) {
+                let v = variant.args.slice(0,-1);
+                v = v.concat(Array(n-variant.args.length+1).fill(variant.args[variant.args.length - 1]));
                 if (want == undefined) {
-                  ret.push([v, variants[0][i][1], context])
+                  ret.push(new ComputedVariant(new Variant(v, variant.ret), context));
                 } else {
-                  let {ok, newcontext, hint} = this.compareVerbs(variants[0][i][1], want, context);
+                  let {ok, newcontext, hint} = this.compareVerbs(variant.ret, want, context);
                   if(ok) {
-                    ret.push([v, variants[0][i][1], newcontext, hint]);
+                    ret.push(new ComputedVariant(new Variant(v, variant.ret),  newcontext, hint));
                   }
                 }
               }
@@ -173,20 +188,17 @@
   function appendTerm(type, terms) {
     if (type == "<aggregation-feature>" || type == "<packet-feature>" || type == "<flow-feature>")
       return;
-    for(let i=0; i<terms.length; i++) {
-      switch(typeof terms[i]) {
+    for(let term of terms) {
+      switch(typeof term) {
           case "string":
-/*                  if (terms[i] == "<feature>" || type == "<feature>") {
-                  continue;
-              }*/
-              defs.addVerb(terms[i], type);
+              defs.addVerb(term, type);
               continue;
           case "boolean":
               defs.addVerb(BOOLEAN, type);
               continue;
           case "object":
-              let key=Object.keys(terms[i])[0];
-              defs.addFunction(key, terms[i][key], type)
+              let key=Object.keys(term)[0];
+              defs.addFunction(key, term[key], type)
               continue;
       }
     }
