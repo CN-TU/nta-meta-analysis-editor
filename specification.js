@@ -1399,7 +1399,7 @@ function peg$parse(input, options) {
   }
 
 
-    const NUMBER = "<free-number>";
+    const NUMBER = "<free-integer>";
     const BOOLEAN = "<free-boolean>";
     const FEATURE = "<base-feature>";
     const ANYTHING = "<anything>"; // for unknown or error recovery
