@@ -13,8 +13,8 @@
 #
 #######
 
-<down> -> <value>  # (packet, flow, flow-agg) can use this rule (0, 1, 2) times
-<down2> -> <down>  # only applicable for flow-aggregations; goes down twice (same as executing down->value rule twice)
+# <down> -> <value>  # (packet, flow, flow-agg) can use this rule (0, 1, 2) times
+# <down2> -> <down>  # only applicable for flow-aggregations; goes down twice (same as executing down->value rule twice)
 
 <value> -> <free-integer> | <base-feature> | <free-float> | <logic>
 
