@@ -15,6 +15,14 @@ const MATH = {
     leq: '<='
 }
 
+function ParseWarning(msg, item) {
+    this.msg = msg;
+    this.location = item.location;
+    this.toString = function () {
+        return this.msg;
+    }
+}
+
 const iana_ies = exports.iana_ies = csv(fs.readFileSync("iana_ies.csv"), { columns: true }).map(
     function (row) {
         return row.Name;
@@ -35,7 +43,7 @@ const own_ies = exports.own_ies = csv(fs.readFileSync("own_ies.csv"), { trim: tr
 ).sort();
 
 
-const specification = exports.specification = require('./specification.js').parse(fs.readFileSync('specification.txt').toString());
+const specification = exports.specification = require('./specification.js').parse(fs.readFileSync('specification.txt').toString(), { ParseWarning: ParseWarning });
 
 function feature(element) {
     this.brace = false;
@@ -122,7 +130,7 @@ exports.feature2text = function (input) {
 const featureParser = require('./feature.js');
 
 exports.text2feature = function (input, errors, context) {
-    let ret = featureParser.parse(input, { MATH: MATH, specification: specification});
+    let ret = featureParser.parse(input, { MATH: MATH, specification: specification, ParseWarning: ParseWarning });
     if (ret === null) {
         return ret;
     }

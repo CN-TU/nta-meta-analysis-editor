@@ -3,6 +3,7 @@
   const BOOLEAN = "<free-boolean>";
   const FEATURE = "<base-feature>";
   const ANYTHING = "<anything>"; // for unknown or error recovery
+  var ParseWarning = options.ParseWarning;
   function down(context) {
       switch(context) {
         case "flows":
@@ -66,8 +67,7 @@
           }
           let variants = this.functions.get(item.name);
           if (variants === undefined) {
-            item.error = "Function not found";
-            err.push(item);
+            err.push(new ParseWarning("Operation '"+item.name+"' not found", item));
             return [[Array(n).fill(ANYTHING), ANYTHING, context]];
           }
           let ret = [];

@@ -20,7 +20,7 @@ function test_feature(input, context) {
         throw [orig, JSON.stringify(parsed)];
     }
     if(errors.length) {
-        throw errors.map((error) => { return "\t\t"+error.error; }).join("\n");
+        throw errors.map((error) => { return "\t\t"+error; }).join("\n");
     }
 }
 

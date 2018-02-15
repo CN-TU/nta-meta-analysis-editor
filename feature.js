@@ -1306,12 +1306,12 @@ function peg$parse(input, options) {
   	function toMath(op, args) {
         return new parsedFeature(MATHBACK[op], args, "operation", location());
     }
+    var ParseWarning = options.ParseWarning;
     function parsedFeature(name, args, type, location) {
       this.type = type
       this.name = name;
       this.args = args;
       this.location = location;
-      this.error = null;
       this.cleanup = function () {
           switch (this.type) {
               case "operation":
@@ -1328,14 +1328,12 @@ function peg$parse(input, options) {
         if (this.args === null) {
           if (want === undefined || options.specification.isValid(this, want, context)[0])
             return true;
-          this.error = "Wanted "+want+", but "+this.name+" is "+type;
-          return [this];
+          return [new ParseWarning("Wanted "+want+", but "+this.name+" is "+options.specification.type(this), this)];
         } else {
           let variants = options.specification.arguments(this, want, specerror, context);
           if (variants.length == 0) {
             variants = options.specification.arguments(this);
-            this.error = "Wanted "+want+", but "+this.name+" is "+variants.map(function(variant) { return variant[1]}).join(" or ");
-            return [this];
+            return [new ParseWarning("Wanted "+want+", but "+this.name+" is "+variants.map(function(variant) { return variant[1]}).join(" or "), this)];
           }
           let overall = false;
           for(let i=0; i<variants.length; i++) {
@@ -1358,9 +1356,8 @@ function peg$parse(input, options) {
               tmp = "";
             let tmp2 = variants;
             if (typeof variants === "object")
-              tmp2 = variants.map(function(variant) { return variant[0].join(",");}).join(" or ")
-            this.error = "Wrong arguments to '"+this.name+"'"+tmp+ "; Possible Arguments: "+tmp2;
-            errors.push(this);
+              tmp2 = variants.map(function(variant) { return variant[0].join(",");}).join(" or ");
+            errors.push(new ParseWarning("Wrong arguments to '"+this.name+"'"+tmp+ "; Possible Arguments: "+tmp2, this));
             return errors; //cascade up
           }
           return true;
