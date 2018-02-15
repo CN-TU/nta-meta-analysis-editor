@@ -77,18 +77,19 @@
         case "boolean":
           return null;
         case "operation":
+          let hints = [];
           let n = item.args.length;
           if (item.name.startsWith('__')) {
-            return [new ComputedVariant(new Variant(Array(n).fill(ANYTHING), ANYTHING), context)];
+            return {variants:[new ComputedVariant(new Variant(Array(n).fill(ANYTHING), ANYTHING), context)]};
           }
           let variants = this.functions.get(item.name);
           if (variants === undefined) {
-            err.push(new ParseWarning("Operation '"+item.name+"' not found", item));
             let hint = [];
             if (item.name == "basedon") {
               hint.push("'basedon' was removed from the spec. Have a look at 'apply'.");
             }
-            return [new ComputedVariant(new Variant(Array(n).fill(ANYTHING), ANYTHING), context, hint)];
+            err.push(new ParseWarning("Operation '"+item.name+"' not found."+(hint.length > 0 ? [""].concat(hint).join(" ") : ""), item));
+            return {variants:[new ComputedVariant(new Variant(Array(n).fill(ANYTHING), ANYTHING), context)]};
           }
           let ret = [];
           if (variants[n] !== undefined) {
@@ -99,6 +100,11 @@
                  let {ok, newcontext, hint} = this.compareVerbs(variant.ret, want, context);
                  if(ok) {
                    ret.push(new ComputedVariant(variant, newcontext, hint));
+                 } else {
+                   if (item.name == "map" && want == "<value>") {
+                     hints.push("Did you mean 'apply'?");
+                   }
+                   hints = hints.concat(hint);
                  }
               }
             }
@@ -113,13 +119,15 @@
                 } else {
                   let {ok, newcontext, hint} = this.compareVerbs(variant.ret, want, context);
                   if(ok) {
-                    ret.push(new ComputedVariant(new Variant(v, variant.ret),  newcontext, hint));
+                    ret.push(new ComputedVariant(new Variant(v, variant.ret), newcontext, hint));
+                  } else {
+                    hints = hints.concat(hint);
                   }
                 }
               }
             }
           }
-          return ret;
+          return {variants: ret, hints: hints};
       }
     }
     this.compareVerbs = function(a, want, context) {

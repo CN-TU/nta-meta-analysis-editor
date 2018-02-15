@@ -31,12 +31,12 @@
         let {ok, hint} = options.specification.isValid(this, want, context);
         if (ok)
           return true;
-        return [new ParseWarning("Wanted "+want+", but "+this.name+" is "+options.specification.type(this)+"."+(hint.length > 0 ? [""].concat(hint).join(" ") : ""), this)];
+        return [new ParseWarning("Wanted "+want+", but '"+this.name+"' is "+options.specification.type(this)+"."+(hint.length > 0 ? [""].concat(hint).join(" ") : ""), this)];
       } else {
-        let variants = options.specification.arguments(this, want, specerror, context);
+        let {variants, hints} = options.specification.arguments(this, want, specerror, context);
         if (variants.length == 0) {
-          variants = options.specification.arguments(this);
-          return [new ParseWarning("Wanted "+want+", but "+this.name+" is "+variants.map(function(variant) {return variant.ret}).join(" or "), this)];
+          variants = options.specification.arguments(this).variants;
+          return [new ParseWarning("Wanted "+want+", but '"+this.name+"' is "+variants.map(function(variant) {return variant.ret}).join(" or ")+"."+(hints.length > 0 ? [""].concat(hints).join(" ") : ""), this)];
         }
         let overall = false;
         for(let variant of variants) {
