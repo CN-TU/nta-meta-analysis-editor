@@ -1,8 +1,8 @@
 const { feature2text, text2feature } = require('./features.js');
 importScripts('./worker.js');
-require('node_modules/ace-builds/src/ace');
+require('node_modules/ace-builds/src-noconflict/ace');
 
-define("ace/worker/mirror", ["require", "exports", "module", "ace/range", "ace/document", "ace/lib/lang"], function (require, exports, module) {
+ace.define("ace/worker/mirror", ["require", "exports", "module", "ace/range", "ace/document", "ace/lib/lang"], function (require, exports, module) {
     "use strict";
 
     var Range = require("../range").Range;
@@ -64,7 +64,7 @@ define("ace/worker/mirror", ["require", "exports", "module", "ace/range", "ace/d
 
 });
 
-define("ntarc_worker", function (require, exports, module) {
+ace.define("ntarc_worker", function (require, exports, module) {
     "use strict";
 
     var oop = require("ace/lib/oop");

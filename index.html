@@ -7,16 +7,20 @@
             position: absolute;
           }
           .ntarc_error {
-            border-right: 3px solid red;
+            border-bottom: 3px solid red;
             position: absolute;
           }
         </style>
     </head>
     <body>
+        <button id="text">Text-Mode</button><button id="ntarc">JSON-Mode</button><br>
         <div id="input" style="height: 200px">count(quantile_range(octetTotalCount / _flowDurationSeconds, 0.05, 0.1));</div><br>
+        <script src="node_modules/ace-builds/src-noconflict/ace.js"></script>
+        <script src="node_modules/ace-builds/src-noconflict/ext-language_tools.js"></script>
+        <script src="mode-ntarc-feature.js"></script>
         <script>
-          require('ace-builds/src/ace');
-          require("ace-builds/src/ext-language_tools");
+          var context = "flows";
+
           var result = document.getElementById("result");
           var editor = ace.edit("input");
           editor.setOptions({
@@ -25,15 +29,46 @@
           });
           editor.setShowPrintMargin(false);
 
-          var EditSession = require('ace/edit_session').EditSession;
+          var EditSession = ace.require('ace/edit_session').EditSession;
 
           var textSession = new EditSession("");
-          textSession.$ntarc_context = "flows";
+          textSession.$ntarc_context = context;
           textSession.setMode('ntarc-feature');
 
           editor.setSession(textSession);
 
+          var ntarcSession = new EditSession("");
+          ntarcSession.setMode('ace/mode/json');
+
+
           const {feature2text, text2feature} = require('./features.js');
+
+          var mode="text";
+
+          document.getElementById('text').onclick = () => {
+            if(mode=="text")
+              return;
+            try {
+              textSession.setValue(JSON.parse(ntarcSession.getValue()).map(feature => { return feature2text(feature);}).join(";\n"));
+            } catch(e) {
+              alert("Invalid JSON");
+              return;
+            }
+            editor.setSession(textSession);
+            mode = "text";
+          };
+          document.getElementById('ntarc').onclick = () => {
+            if(mode=="ntarc")
+              return;
+            try {
+              ntarcSession.setValue(JSON.stringify(textSession.getValue().split(';').map(feature => { return text2feature(feature, [], context);}).filter(feature => { return feature!==null;}), null, 2));
+            } catch(e) {
+              alert("Invalid Text");
+              return;
+            }
+            editor.setSession(ntarcSession);
+            mode = "ntarc";
+          };
       </script>
     </body>
 </html>

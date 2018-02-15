@@ -1,5 +1,5 @@
 const features = require('./features.js');
-define('ntarc-feature', function (require, exports, module) {
+ace.define('ntarc-feature', function (require, exports, module) {
 
     var oop = require("ace/lib/oop");
     var config = require("ace/config");
@@ -101,7 +101,7 @@ define('ntarc-feature', function (require, exports, module) {
     exports.Mode = Mode;
 });
 
-define('ntarc_highlight_rules', function (require, exports, module) {
+ace.define('ntarc_highlight_rules', function (require, exports, module) {
 
     var oop = require("ace/lib/oop");
     var TextHighlightRules = require("ace/mode/text_highlight_rules").TextHighlightRules;
