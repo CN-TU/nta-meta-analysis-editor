@@ -75,16 +75,20 @@ function fun(op, args) {
         return ret;
     }
     this.simplify = function (top, position) {
-        if (this.brace && top !== undefined) {
-            if (top.toMath() === undefined) {
+        if (this.brace) {
+            if (top === undefined) {
                 this.brace = false;
             } else {
-                if ((this.op == "multiply" || this.op == "divide") && (top.op == "add" || top.op == "subtract")) {
+                if (top.toMath() === undefined) {
                     this.brace = false;
-                }
-                if (position == 0 && (((this.op == "multiply" || this.op == "divide") && (top.op == "multiply" || top.op == "divide")) ||
-                    ((this.op == "add" || this.op == "subtract") && (top.op == "add" || top.op == "subtract")))) {
-                    this.brace = false;
+                } else {
+                    if ((this.op == "multiply" || this.op == "divide") && (top.op == "add" || top.op == "subtract")) {
+                        this.brace = false;
+                    }
+                    if (position == 0 && (((this.op == "multiply" || this.op == "divide") && (top.op == "multiply" || top.op == "divide")) ||
+                        ((this.op == "add" || this.op == "subtract") && (top.op == "add" || top.op == "subtract")))) {
+                        this.brace = false;
+                    }
                 }
             }
         }
