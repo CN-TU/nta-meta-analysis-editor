@@ -15,12 +15,12 @@ const MATH = {
     leq: '<='
 }
 
-const iana_ies = exports.iana_ies =  csv(fs.readFileSync("iana_ies.csv"), {columns: true}).map(
-    function(row) {
+const iana_ies = exports.iana_ies = csv(fs.readFileSync("iana_ies.csv"), { columns: true }).map(
+    function (row) {
         return row.Name;
     }
 ).filter(
-    function(row) {
+    function (row) {
         if (row != "" &&
             row != "Reserved" &&
             row != "Unassigned" &&
@@ -28,8 +28,8 @@ const iana_ies = exports.iana_ies =  csv(fs.readFileSync("iana_ies.csv"), {colum
             return true;
     }
 ).sort();
-const own_ies = exports.own_ies = csv(fs.readFileSync("own_ies.csv"), {trim: true}).map(
-    function(row) {
+const own_ies = exports.own_ies = csv(fs.readFileSync("own_ies.csv"), { trim: true }).map(
+    function (row) {
         return row[0];
     }
 ).sort();
@@ -111,21 +111,21 @@ function feature2text(input) {
     }
 }
 
-exports.feature2text = function(input) {
+exports.feature2text = function (input) {
     return feature2text(input).simplify().render();
 }
 
 const featureParser = require('./feature.js');
 
-exports.text2feature = function(input, errors) {
-    let ret = featureParser.parse(input, {MATH: MATH, specification: specification});
+exports.text2feature = function (input, errors, context) {
+    let ret = featureParser.parse(input, { MATH: MATH, specification: specification});
     if (ret === null) {
         return ret;
     }
     let err = ret.check(errors);
     if (err !== true)
-//        errors.push(err[0]);
-        for(let i=0; i<err.length; i++) {
+        //        errors.push(err[0]);
+        for (let i = 0; i < err.length; i++) {
             errors.push(err[i]);
         }
     return ret.cleanup();
