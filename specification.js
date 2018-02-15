@@ -1432,9 +1432,9 @@ function peg$parse(input, options) {
       this.addFunction = function(name, args, ret) {
         args = args[0];
         let id = args.length;
-        if (typeof args[0] == "object" && args[0].type == "oneormore") {
+        if (typeof args[args.length - 1] == "object" && args[args.length - 1].type == "oneormore") {
           id = 0;
-          args = args[0].term;
+          args[args.length - 1] = args[args.length - 1].term;
         }
         if (this.functions.has(name)) {
           if (this.functions.get(name)[id] !== undefined) {
@@ -1490,13 +1490,17 @@ function peg$parse(input, options) {
             }
             if (variants[0] !== undefined) {
               for(let i=0; i<variants[0].length; i++) {
-                if (want == undefined) {
-                  ret.push([Array(n).fill(variants[0][i][0]), variants[0][i][1], context])
-                } else {
-                   let {ok, newcontext, hint} = this.compareVerbs(variants[0][i][1], want, context);
-                   if(ok) {
-                     ret.push([Array(n).fill(variants[0][i][0]), variants[0][i][1], newcontext, hint]);
-                   }
+                if (n >= variants[0][i][0].length) {
+                  let v = variants[0][i][0].slice(0,-1);
+                  v = v.concat(Array(n-variants[0][i][0].length+1).fill(variants[0][i][0][variants[0][i][0].length - 1]));
+                  if (want == undefined) {
+                    ret.push([v, variants[0][i][1], context])
+                  } else {
+                    let {ok, newcontext, hint} = this.compareVerbs(variants[0][i][1], want, context);
+                    if(ok) {
+                      ret.push([v, variants[0][i][1], newcontext, hint]);
+                    }
+                  }
                 }
               }
             }
