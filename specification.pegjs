@@ -4,6 +4,11 @@
   const FEATURE = "<base-feature>";
   const ANYTHING = "<anything>"; // for unknown or error recovery
   var ParseWarning = options.ParseWarning;
+  function VerbCheck(ret, context, hint) {
+    this.ok = ret;
+    this.newcontext = context;
+    this.hint = hint;
+  }
   function down(context) {
       switch(context) {
         case "flows":
@@ -63,12 +68,12 @@
         case "operation":
           let n = item.args.length;
           if (item.name.startsWith('__')) {
-            return [[Array(n).fill(ANYTHING), ANYTHING, context]];
+            return [[Array(n).fill(ANYTHING), ANYTHING, context, undefined]];
           }
           let variants = this.functions.get(item.name);
           if (variants === undefined) {
             err.push(new ParseWarning("Operation '"+item.name+"' not found", item));
-            return [[Array(n).fill(ANYTHING), ANYTHING, context]];
+            return [[Array(n).fill(ANYTHING), ANYTHING, context, undefined]];
           }
           let ret = [];
           if (variants[n] !== undefined) {
@@ -76,9 +81,9 @@
               if (want == undefined) {
                 ret.push(variants[n][i].concat(context));
               } else {
-                 let [ok, newcontext] = this.compareVerbs(variants[n][i][1], want, context);
+                 let {ok, newcontext, hint} = this.compareVerbs(variants[n][i][1], want, context);
                  if(ok) {
-                   ret.push(variants[n][i].concat(newcontext));
+                   ret.push(variants[n][i].concat(newcontext, hint));
                  }
               }
             }
@@ -88,9 +93,9 @@
               if (want == undefined) {
                 ret.push([Array(n).fill(variants[0][i][0]), variants[0][i][1], context])
               } else {
-                 let [ok, newcontext] = this.compareVerbs(variants[0][i][1], want, context);
+                 let {ok, newcontext, hint} = this.compareVerbs(variants[0][i][1], want, context);
                  if(ok) {
-                   ret.push([Array(n).fill(variants[0][i][0]), variants[0][i][1], newcontext]);
+                   ret.push([Array(n).fill(variants[0][i][0]), variants[0][i][1], newcontext, hint]);
                  }
               }
             }
@@ -99,33 +104,46 @@
       }
     }
     this.compareVerbs = function(a, want, context) {
-      if (want == ANYTHING) return [true, context];
-      if (a == want) return [true, context];
+      if (want == ANYTHING) return new VerbCheck(true, context);
+      if (a == want) return new VerbCheck(true, context);
+      let hint = undefined;
       if (this.verbs.has(a)) {
         for(let newa of this.verbs.get(a)) {
-          let [ok, newcontext] = this.compareVerbs(newa, want, context)
-          if (ok)
-            return [true, newcontext];
+          let ret = this.compareVerbs(newa, want, context)
+          if (ret.ok)
+            return ret;
+          hint = ret.hint;
         }
       }
       if(a == "<value>") {
-        let tmp = down2(context);
-        if(tmp !== false) {
-          let [ok, newcontext] = this.compareVerbs("<down2>", want, tmp)
-          if (ok)
-            return [true, newcontext];
+        let d2ok = down2(context);
+        if(d2ok === false) {
+        } else {
+          let ret = this.compareVerbs("<down2>", want, d2ok)
+          if (ret.ok)
+            return ret;
+          hint = ret.hint;
         }
-        tmp = down(context);
-        console.log("down possible?", context, tmp);
-        if(tmp !== false) {
-          let [ok, newcontext] = this.compareVerbs("<down>", want, tmp)
-          if (ok) {
-            console.log("down used!");
-            return [true, newcontext];
+        let dok = down(context);
+        if(dok === false) {
+        } else {
+          let ret = this.compareVerbs("<down>", want, dok)
+          if (ret.ok) {
+            return ret;
           }
+          hint = ret.hint;
+        }
+        switch(want) {
+          case "<down2>":
+            hint = "Only possible in 'flow_aggregations', but at this point context is '"+context+"'.";
+            break;
+          case "<down>":
+          case "<values>":
+            hint = "Only possible in 'flow_aggregations' or 'flows', but at this point context is '"+context+"'.";
+            break;
         }
       }
-      return [false, context];
+      return new VerbCheck(false, context, hint);
     }
     this.isValid = function(item, want, context) {
       return this.compareVerbs(this.type(item), want, context);

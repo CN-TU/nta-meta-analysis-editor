@@ -26,9 +26,12 @@
     this.check = function (specerror, want, context) {
       let errors = []
       if (this.args === null) {
-        if (want === undefined || options.specification.isValid(this, want, context)[0])
+        if (want === undefined)
           return true;
-        return [new ParseWarning("Wanted "+want+", but "+this.name+" is "+options.specification.type(this), this)];
+        let {ok, hint} = options.specification.isValid(this, want, context);
+        if (ok)
+          return true;
+        return [new ParseWarning("Wanted "+want+", but "+this.name+" is "+options.specification.type(this)+(hint !== undefined ? ". "+hint : ""), this)];
       } else {
         let variants = options.specification.arguments(this, want, specerror, context);
         if (variants.length == 0) {
