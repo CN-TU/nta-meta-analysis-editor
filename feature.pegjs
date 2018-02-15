@@ -1,4 +1,7 @@
 {
+  var iana_ies = options.iana_ies;
+  var own_ies = options.own_ies;
+  var feature_aliases = options.feature_aliases;
   var MATHBACK = {};
   for(var key in options.MATH){
     MATHBACK[options.MATH[key]] = key;
@@ -7,11 +10,29 @@
       return new parsedFeature(MATHBACK[op], args, "operation", location());
   }
   var ParseWarning = options.ParseWarning;
-  function parsedFeature(name, args, type, location) {
-    this.type = type
+  function createFakeFeature(base, fake) {
+    switch(typeof fake) {
+      case "number":
+        return new parsedFeature(fake, null, "number", base.location, base.name);
+      case "boolean":
+        return new parsedFeature(fake, null, "boolean", base.location, base.name);
+      case "string":
+        return new parsedFeature(fake, null, "feature", base.location, base.name);
+      case "object":
+        let key = Object.keys(fake)[0];
+        let args = fake[key].map(arg => {
+          return createFakeFeature(base, arg);
+        });
+        return new parsedFeature(key, args, "operation", base.location, base.name);
+    }
+    throw "This should never happen";
+  }
+  function parsedFeature(name, args, type, location, fake) {
+    this.type = type;
     this.name = name;
     this.args = args;
     this.location = location;
+    this.fake = fake;
     this.cleanup = function () {
         switch (this.type) {
             case "operation":
@@ -24,25 +45,31 @@
     }
 
     this.check = function (specerror, want, context) {
-      let errors = []
-      if (this.args === null) {
+      let errors = [];
+      let feature = feature_aliases[this.name];
+      if (feature === undefined)
+        feature = this;
+      else
+        feature = createFakeFeature(this, feature);
+      // check name here
+      if (feature.args === null) {
         if (want === undefined)
           return true;
-        let {ok, hint} = options.specification.isValid(this, want, context);
+        let {ok, hint} = options.specification.isValid(feature, want, context);
         if (ok)
           return true;
-        return [new ParseWarning("Wanted "+want+", but '"+this.name+"' is "+options.specification.type(this)+"."+(hint.length > 0 ? [""].concat(hint).join(" ") : ""), this)];
+        return [new ParseWarning("Wanted "+want+", but '"+feature.name+"' is "+options.specification.type(feature)+"."+(hint.length > 0 ? [""].concat(hint).join(" ") : ""), feature)];
       } else {
-        let {variants, hints} = options.specification.arguments(this, want, specerror, context);
+        let {variants, hints} = options.specification.arguments(feature, want, specerror, context);
         if (variants.length == 0) {
-          variants = options.specification.arguments(this).variants;
-          return [new ParseWarning("Wanted "+want+", but '"+this.name+"' is "+variants.map(function(variant) {return variant.ret}).join(" or ")+"."+(hints.length > 0 ? [""].concat(hints).join(" ") : ""), this)];
+          variants = options.specification.arguments(feature).variants;
+          return [new ParseWarning("Wanted "+want+", but '"+feature.name+"' is "+variants.map(function(variant) {return variant.ret}).join(" or ")+"."+(hints.length > 0 ? [""].concat(hints).join(" ") : ""), feature)];
         }
         let overall = false;
         for(let variant of variants) {
           let result = true;
           for(let i=0; i<variant.args.length; i++) {
-            let error = this.args[i].check(specerror, variant.args[i], variant.context)
+            let error = feature.args[i].check(specerror, variant.args[i], variant.context)
             if(error !== true) {
               errors = errors.concat(error);
               result = false;
@@ -60,7 +87,7 @@
           let tmp2 = variants;
           if (typeof variants === "object")
             tmp2 = variants.map(function(variant) { return variant.args.join(",");}).join(" or ");
-          errors.push(new ParseWarning("Wrong arguments to '"+this.name+"'"+tmp+ "; Possible Arguments: "+tmp2, this));
+          errors.push(new ParseWarning("Wrong arguments to '"+feature.name+"'"+tmp+ "; Possible Arguments: "+tmp2, feature));
           return errors; //cascade up
         }
         return true;

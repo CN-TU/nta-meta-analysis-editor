@@ -17,6 +17,9 @@ const MATH = {
 
 function ParseWarning(msg, item) {
     this.msg = msg;
+    if(item.fake !== undefined) {
+        this.msg = "Expanded from alias '"+item.fake+"': "+this.msg;
+    }
     this.location = item.location;
     this.toString = function () {
         return this.msg;
@@ -41,6 +44,7 @@ const own_ies = exports.own_ies = csv(fs.readFileSync("own_ies.csv"), { trim: tr
         return row[0];
     }
 ).sort();
+const feature_aliases = exports.feature_aliases = JSON.parse(fs.readFileSync("feature_aliases.json").toString());
 
 
 const specification = exports.specification = require('./specification.js').parse(fs.readFileSync('specification.txt').toString(), { ParseWarning: ParseWarning });
@@ -130,7 +134,14 @@ exports.feature2text = function (input) {
 const featureParser = require('./feature.js');
 
 exports.text2feature = function (input, errors, context) {
-    let ret = featureParser.parse(input, { MATH: MATH, specification: specification, ParseWarning: ParseWarning });
+    let ret = featureParser.parse(input, {
+        MATH: MATH,
+        specification: specification,
+        ParseWarning: ParseWarning,
+        iana_ies: iana_ies,
+        own_ies: own_ies,
+        feature_aliases: feature_aliases
+    });
     if (ret === null) {
         return ret;
     }
