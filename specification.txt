@@ -1,22 +1,19 @@
-# features
-<feature> -> <value> | <base-feature>
-# end
-
-<packet-feature> -> <feature>
-<flow-feature> -> <feature>
-<aggregation-feature> -> <feature>
-
 # operation
 # <value> always outputs a single number (a <value>)
+# <down> -> <value>  # (packet, flow, flow-agg) can use this rule (0, 1, 2) times
+# <down2> -> <value> # flow-agg -> packet
+
+<free> -> <free-number>
+
 <value> -> {"mean": [<values>]}
 <value> -> {"stdev": [<values>]}
 <value> -> {"variance": [<values>]}
 <value> -> {"median": [<values>]}
 <value> -> {"quantile": [<values>, <value>]} # second argument is a number from 0 to 1, where 0 is the minimum and 1 the maximum
-<value> -> {"minimum": [<values>]} | {"minimum": [<value>+]}
-<value> -> {"maximum": [<values>]} | {"maximum": [<value>+]}
-<value> -> {"argmin": [<values>]} | {"argmin": [<value>+]}
-<value> -> {"argmax": [<values>]} | {"argmax": [<value>+]}
+<value> -> {"minimum": [<values>]} | {"minimum": [<value>,<value>+]}
+<value> -> {"maximum": [<values>]} | {"maximum": [<value>,<value>+]}
+<value> -> {"argmin": [<values>]} | {"argmin": [<value>,<value>+]}
+<value> -> {"argmax": [<values>]} | {"argmax": [<value>,<value>+]}
 <value> -> {"floor": [<value>]}
 <value> -> {"ceil": [<value>]}
 <value> -> {"mode": [<values>]} # returns the most frequent element in <values>
@@ -24,56 +21,59 @@
 <value> -> {"moment": [<values>, <value>]} # returns the <value>-th standardized moment of <values>
 <value> -> {"count": [<selection>]} | {"count": [<values>]}  # returns number of selected objects
 <value> -> {"distinct": [<values>]}  # returns number of distinct values in <feature> in the selected objects
-<value> -> {"apply": [<feature>, <selection>]}  # returns a single feature value for the selection of objects
-<value> -> {"add": [<value>+]} | {"add": [<values>]}
-<values> -> {"add": [<value>, <values>]} | {"add": [<values>, <value>]} | {"add": [<values>+]}
+<value> -> {"apply": [<value>, <selection>]}  # returns a single feature value for the selection of objects
+<value> -> {"add": [<value>,<value>+]} | {"add": [<values>]}
 <value> -> {"subtract": [<value>, <value>]}
-<values> -> {"subtract": [<value>, <values>]} | {"subtract": [<values>, <value>]} | {"subtract": [<values>, <values>]}
-<value> -> {"multiply": [<value>+]} | {"multiply": [<values>]}
-<values> -> {"multiply": [<value>, <values>]} | {"multiply": [<values>, <value>]} | {"multiply": [<values+>]}
+<value> -> {"multiply": [<value>,<value>+]} | {"multiply": [<values>]}
 <value> -> {"divide": [<value>, <value>]}
-<values> -> {"divide": [<value>, <values>]} | {"divide": [<values>, <value>]} | {"divide": [<values>, <values>]}
 <value> -> {"log": [<value>]}
-<values> -> {"log": [<values>]}
 <value> -> {"exp": [<value>]}
-<values> -> {"exp": [<values>]}
 <value> -> {"entropy": [<value>]}
 <value> -> {"get": [<value>, <values>]} | {"get": [<value>, <value>]}  # gets the <value>-th element of the second argument (if the second argument is also <value>, the elements are bits)
 <value> -> {"ifelse": [<logic>, <value>, <value>]}  # if the condition is true, return the first argument else the second
-<value> -> {"get_previous": [<aggregation-feature>]}  # gets feature at time = t-1
+<value> -> {"get_previous": [<value>]}  # gets feature at time = t-1
 <value> -> {"left_shift": [<value>, <value>]}  # shift the bits in the first value left by the second value
-<values> -> {"left_shift": [<values>, <value>]}  # shift the bits in the first value left by the second value
 <value> -> {"right_shift": [<value>, <value>]}  # shift the bits in the first value right by the second value
-<values> -> {"right_shift": [<values>, <value>]}  # shift the bits in the first value left by the second value
-<value> -> <free-integer> | <base-feature> | <free-float>
+<value> -> <base-feature> | <free> | <logic>
 # end
 
 # values
 # <values> outputs a list of <value>
-<values> -> {"map": [<feature>, <selection>]}  # returns a feature value for each object in selection
+<values> -> {"map": [<down>, <selection>]}  # returns a feature value for each object in selection
+<values> -> {"flat_map": [<down2>, <selection>]}
+<values> -> {"flat_map": [<down2>, <selection>, <selection>]}
 <values> -> {"slice": [<value>, <value>, <values>]} | {"slice": [<value>, <value>, <value>]}  # gets third_argument[first_argument, second_argument] (if the third argument is also <value>, the elements are bits); indexing is like in Python
 <values> -> {"quantile_range": [<values>, <value>, <value>]} # e.g. {"quantile_range": [<values>, 0, 0.25]} returns all values in the first quartile
-<values> -> <feature>  # features from one level-down (in flows, packet features; in flow-aggregations, flow features)
+<values> -> <down>
 # end
 
 # selection
 # <selection> outputs a list of objects (packets, flows or aggregations, depending on what kind of feature is used)
-<selection> -> {"select": [<logic>]}
+<selection> -> {"select": [<downlogic>]}
 <selection> -> {"select_slice": [<value>, <value>]} | {"select_slice": [<value>, <value>, <selection>]}  # selects a slice from the first value to the second value, with Python-like indexing (if a <selection is not provided, default to selecting everything)
 <selection> -> "forward" | "backward"  # special cases for selection; select objects in the forward (or backward) direction
-<selection> -> {"select_flows": [<logic>]}  # same as "select", but outputs flows; only valid when used in flow aggregations
-<selection> -> {"select_slice_flows": [<value>, <value>]} | {"select_slice_flows": [<value>, <value>, <selection>]}  # same as "select_slice", but outputs flows; only valid when used in flow aggregations
-<selection> -> "forward_flows" | "backward_flows"  # same as "forward"/"backward", but outputs flows; only valid when used in flow aggregations
 # end
 
 # logic
 # <logic> is used for selection, should be evaluated for each object
 <logic> -> {"and": [<logic>+]} 
 <logic> -> {"or": [<logic>+]}
-<logic> -> {"geq": [<feature>, <value>]}
-<logic> -> {"leq": [<feature>, <value>]}
-<logic> -> {"less": [<feature>, <value>]}
-<logic> -> {"greater": [<feature>, <value>]}
-<logic> -> {"equal": [<feature>, <value>]}
-<logic> -> true | false
+<logic> -> {"geq": [<value>, <value>]}
+<logic> -> {"leq": [<value>, <value>]}
+<logic> -> {"less": [<value>, <value>]}
+<logic> -> {"greater": [<value>, <value>]}
+<logic> -> {"equal": [<value>, <value>]}
+<logic> -> <free-boolean>
+# end
+
+# logic
+# <logic> is used for selection, should be evaluated for each object
+<downlogic> -> {"and": [<downlogic>+]}
+<downlogic> -> {"or": [<downlogic>+]}
+<downlogic> -> {"geq": [<down>, <value>]}
+<downlogic> -> {"leq": [<down>, <value>]}
+<downlogic> -> {"less": [<down>, <value>]}
+<downlogic> -> {"greater": [<down>, <value>]}
+<downlogic> -> {"equal": [<down>, <value>]}
+<downlogic> -> <free-boolean>
 # end

@@ -122,7 +122,7 @@ exports.text2feature = function (input, errors, context) {
     if (ret === null) {
         return ret;
     }
-    let err = ret.check(errors);
+    let err = ret.check(errors, specification.BASE, context);
     if (err !== true)
         //        errors.push(err[0]);
         for (let i = 0; i < err.length; i++) {

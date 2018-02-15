@@ -1323,25 +1323,15 @@ function peg$parse(input, options) {
           }
       }
 
-      this.check = function (specerror, want) {
+      this.check = function (specerror, want, context) {
         let errors = []
         if (this.args === null) {
-          if (want === undefined || options.specification.isValid(this, want))
+          if (want === undefined || options.specification.isValid(this, want, context)[0])
             return true;
-          let type = "<???>";
-          switch(this.type) {
-            case "number":
-            case "boolean":
-              type = "<value>";
-              break;
-            case "feature":
-              type = "<feature>";
-              break;
-          }
           this.error = "Wanted "+want+", but "+this.name+" is "+type;
           return [this];
         } else {
-          let variants = options.specification.arguments(this, want, specerror);
+          let variants = options.specification.arguments(this, want, specerror, context);
           if (variants.length == 0) {
             variants = options.specification.arguments(this);
             this.error = "Wanted "+want+", but "+this.name+" is "+variants.map(function(variant) { return variant[1]}).join(" or ");
@@ -1351,7 +1341,7 @@ function peg$parse(input, options) {
           for(let i=0; i<variants.length; i++) {
             let result = true;
             for(let j=0; j<variants[i][0].length; j++) {
-              let error = this.args[j].check(specerror, variants[i][0][j])
+              let error = this.args[j].check(specerror, variants[i][0][j], variants[i][2])
               if(error !== true) {
                 errors = errors.concat(error);
                 result = false;
@@ -1367,7 +1357,7 @@ function peg$parse(input, options) {
             if (want === undefined)
               tmp = "";
             let tmp2 = variants;
-            if (typeof variants !== "string") 
+            if (typeof variants === "object")
               tmp2 = variants.map(function(variant) { return variant[0].join(",");}).join(" or ")
             this.error = "Wrong arguments to '"+this.name+"'"+tmp+ "; Possible Arguments: "+tmp2;
             errors.push(this);
