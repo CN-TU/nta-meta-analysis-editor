@@ -124,13 +124,13 @@ Arguments =
 	a:(f:Level0 ',' { return f;})* f:Level0 { return a.concat([f]);}
 
 Const "Constant"
-  = Integer / Bool
+  = Number / Bool
 
 Identifier "Feature"
   = [a-z0-9_]i+ { return text(); }
 
-Integer
-  =([0-9]+[.]?[0-9]*/[.][0-9]+) { return new parsedFeature(Number(text()), null, "number", location()); }
+Number
+  ='-'?([0-9]+[.]?[0-9]*/[.][0-9]+)([eE][+-]?[0-9]+)? { return new parsedFeature(Number(text()), null, "number", location()); }
   
 Bool
   = ('true'i/'false'i) { return new parsedFeature(text().toLowerCase() == "true", null, "boolean", location()); }
