@@ -86,7 +86,9 @@
         var editor = null
 
         function featuresChanged(context) {
-            for(let row of editor.getEditor('root.preprocessing.'+context).rows) {
+            let ctx = editor.getEditor('root.preprocessing.'+context);
+            if (ctx === undefined || ctx === null) return;
+            for(let row of ctx.rows) {
                 let subeditor = editor.getEditor(row.path+'.features');
                 if(subeditor.switcher.nextSibling.id == "feature_editor_button")
                     continue;
