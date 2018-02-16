@@ -3,15 +3,13 @@ const path = require('path')
 const url = require('url')
 const https = require('https')
 const fs = require('fs')
+const download = require('download-tarball');
 
-
-const PROJECT = "CN-TU/nta-meta-analysis"
-const API_URL = "https://api.github.com/repos/"
-const DL_URL = "https://raw.githubusercontent.com/"
+const {PROJECT, API_URL, needed} = require('./config.js');
 
 var windows = {}
 var helpwindow = null
-const base_path = '.'
+const base_path = path.join(app.getPath('appData'), 'ntarc');
 
 function displayHelp(url) {
     if (helpwindow === null) {
@@ -40,6 +38,7 @@ function displayHelp(url) {
 
 function createWindow (filename) {
     win = new BrowserWindow()
+    win.ntarc_base_path = base_path;
     const id = win.id
     windows[id] = win
 
@@ -83,34 +82,53 @@ function copy(src, dst) {
     fs.closeSync(b)
 }
 
-function updateAvailable(sha) {
+function updateAvailable(sha, tag) {
     result = dialog.showMessageBox({
             "type": "info",
             "title": "Update available",
-            "message": "There is a newer paper JSON spec available. Update?",
+            "message": "There is a newer specification available. Update?",
             "buttons": ["Yes", "No"],
             "defaultId": 0,
             "cancelId": 1
     })
     if (result == 0) {
-        file = fs.createWriteStream(path.join(app.getPath('appData'), 'schema_v2.json'))
-        request = https.get(DL_URL + PROJECT + "/master/schema_v2.json", function(response) {
-            response.pipe(file);
-            response.on('end', () => {
-                fs.writeFileSync(path.join(app.getPath('appData'), 'commit.txt'), sha)
-                dialog.showMessageBox({
-                        "type": "info",
-                        "title": "Update downloaded",
-                        "message": "Update successfully downloaded. To use the new specification, reopen all windows.",
-                        "buttons": ["Ok"]
-                })
-            })
+        download({
+            url: API_URL + PROJECT + 'tarball/'+tag,
+            dir: base_path,
+            extractOpts: {
+                ignore: (_, header) => {
+                    if(needed.has(header.name)) return false;
+                    return true;
+                },
+                map: header => {
+                    header.name = header.name.split('/').slice(1).join('/');
+                    return header;
+                }
+            }
+        }).then(() => {
+            fs.writeFileSync(path.join(base_path, 'commit.json'), JSON.stringify({sha:sha, tag:tag}));
+            dialog.showMessageBox({
+                    "type": "info",
+                    "title": "Update downloaded",
+                    "message": "Update successfully downloaded. To use the new specification, reopen all windows.",
+                    "buttons": ["Ok"]
+            });
+            console.log("update ok!")
+        }).catch(err => {
+            dialog.showMessageBox({
+                "type": "error",
+                "title": "Error during download",
+                "message": err,
+                "buttons": ["Ok"]
+            });
         });
     }
 }
 
 function checkUpdate() {
-    req = net.request(API_URL + PROJECT + "/commits?path=schema_v2.json")
+    let link = url.parse(API_URL + PROJECT + "/tags");
+    link.headers =  {'User-Agent': 'CN-TU/nta-meta-analysis-editor updater'};
+    req = net.request(link);
     req.on('response', (response) => {
         if (response.statusCode == 200) {
             var data = ''
@@ -119,10 +137,17 @@ function checkUpdate() {
             })
             response.on('end', () => {
                 data = JSON.parse(data)
-                if (data.length > 1) {
-                    if (data[0].sha != fs.readFileSync(path.join(cfgpath, 'commit.txt'), 'utf8').trim()) {
-                        updateAvailable(data[0].sha)
-                    }
+                data = new Map(data.map(tag => {return [tag.name, tag.commit.sha];}));
+                let tags = Array.from(data.keys()).sort();
+                let latestTag = tags[tags.length - 1];
+                let {sha, tag} = JSON.parse(fs.readFileSync(path.join(base_path, 'commit.json'), 'utf8'));
+                if (latestTag > tag) {
+                    updateAvailable(data.get(latestTag), latestTag);
+                } else {
+                    if (sha != data.get(latestTag))
+                        updateAvailable(data.get(latestTag), latestTag);
+                    else
+                        console.log("no update needed")
                 }
             })
         }
@@ -131,10 +156,24 @@ function checkUpdate() {
 }
 
 app.on('ready', () => {
-    cfgpath = app.getPath('appData') //use subpath
-    if (!fs.existsSync(path.join(cfgpath, 'schema_v2.json')) || !fs.existsSync(path.join(cfgpath, 'commit.txt'))) {
-        copy(path.join(__dirname, 'schema_v2.json'), path.join(cfgpath, 'schema_v2.json'))
-        copy(path.join(__dirname, 'commit.txt'), path.join(cfgpath, 'commit.txt'))
+    var needFix = false;
+    for(let f of needed) {
+        if(!fs.existsSync(path.join(base_path, f)))
+        {
+            needFix = true;
+            break;
+        }
+    }
+    if(needFix == false) {
+        if(!fs.existsSync(path.join(base_path, 'commit.json'))) {
+            needFix = true;
+        }
+    }
+    if (needFix) {
+        fs.mkdirSync(base_path);
+        for(let f of needed)
+            copy(path.join(__dirname, f), path.join(base_path, f))
+        copy(path.join(__dirname, 'commit.json'), path.join(base_path, 'commit.json'))
     }
 
     createWindow()
@@ -155,8 +194,6 @@ ipcMain.on('fileOpen', (event, arg) => {
 ipcMain.on('launchEditor', (event, id, which, feature, context) => {
     let featureWindow = new BrowserWindow({
         title: "Feature Editor - "+context,
-/*        width: 800,
-        height: 600,*/
         modal: true,
         parent: windows[id],
         webPreferences: {

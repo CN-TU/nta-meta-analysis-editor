@@ -73,6 +73,7 @@
         const dialog = require('electron').remote.dialog
         const {ipcRenderer} = require('electron')
         const {remote} = require('electron')
+        const {ntarc_base_path} = remote.getCurrentWindow();
 
         JSONEditor.defaults.options.show_errors = 'always'
         JSONEditor.defaults.editors.object.options.collapsed = true
@@ -81,7 +82,7 @@
         var fileChanged = false
         var loading = false;
         var filename = null
-        var schema = JSON.parse(fs.readFileSync(path.join(__dirname, 'schema_v2.json'), 'utf8'))
+        var schema = JSON.parse(fs.readFileSync(path.join(ntarc_base_path, 'schema_v2.json'), 'utf8'))
         var editor = null
 
         function featuresChanged(context) {
@@ -100,7 +101,10 @@
             }
         }
         ipcRenderer.on('change-feature', (event, which, feature) => {
-            editor.getEditor(which).setValue(JSON.parse(feature));
+            let elem = editor.getEditor(which)
+            console.log(JSON.stringify(elem.getValue()), feature);
+            if (JSON.stringify(elem.getValue()) != feature)
+                elem.setValue(JSON.parse(feature));
         });
 
         function somethingChanged() {

@@ -75,7 +75,7 @@
           document.getElementById('ok').onclick = () => {
             let ret;
             try {
-              ret = JSON.stringify(textSession.getValue().split(';').map(feature => { return text2feature(feature, [], ntarc_context);}).filter(feature => { return feature!==null;}), null, 2);
+              ret = JSON.stringify(textSession.getValue().split(';').map(feature => { return text2feature(feature, [], ntarc_context);}).filter(feature => { return feature!==null;}));
             } catch(e) {
               console.log(e);
               alert("Invalid Text");
