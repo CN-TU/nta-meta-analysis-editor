@@ -12,6 +12,21 @@ const DL_URL = "https://raw.githubusercontent.com/"
 var windows = {}
 var helpwindow = null
 
+function openFeatureEditor(feature, context, base_path) {
+    var featureWindow = new BrowserWindow({
+        width: 800,
+        height: 600,
+        webPreferences: {
+            nodeIntegrationInWorker: true
+        }
+    });
+    featureWindow.ntarc_feature = feature;
+    featureWindow.ntarc_context = context;
+    featureWindow.ntarc_base_path = base_path;
+    featureWindow.loadURL('file://' + __dirname + '/index.html');
+    featureWindow.openDevTools();
+}
+
 function displayHelp(url) {
     if (helpwindow === null) {
         helpwindow = new BrowserWindow({
@@ -162,3 +177,4 @@ app.on('activate', () => {
         createWindow()
     }
 })
+

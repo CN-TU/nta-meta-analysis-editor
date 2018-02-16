@@ -1,0 +1,88 @@
+# Design notes:
+#
+# - why <values> -> <down>?
+#   * you can have mean(base-feature)
+# - why not <down> in mean?
+#   * wouldn't allow map
+# - why not <values> in map?
+#   * would allow for map(map(map(map(...
+# - why not <value> in map?
+#   * would allow for mean(map(mean(map(mean(...
+# - why {"minimum": [<value>]} not allowed?
+#   * {"minimum": [<values>]} needs <down> to reach <value>, but {"minimum": [<value>]} would bypass needing <down>
+#
+#######
+
+# <down> -> <value>  # (packet, flow, flow-agg) can use this rule (0, 1, 2) times
+# <down2> -> <down>  # only applicable for flow-aggregations; goes down twice (same as executing down->value rule twice)
+
+<value> -> <free-integer> | <base-feature> | <free-float> | <logic>
+
+# operation
+# <value> always outputs a single number (a <value>)
+<value> -> {"mean": [<values>]}
+<value> -> {"stdev": [<values>]}
+<value> -> {"variance": [<values>]}
+<value> -> {"median": [<values>]}
+<value> -> {"quantile": [<values>, <value>]} # second argument is a number from 0 to 1, where 0 is the minimum and 1 the maximum
+<value> -> {"minimum": [<values>]} | {"minimum": [<value>, <value>+]}
+<value> -> {"maximum": [<values>]} | {"maximum": [<value>, <value>+]}
+<value> -> {"argmin": [<values>]} | {"argmin": [<value>, <value>+]}
+<value> -> {"argmax": [<values>]} | {"argmax": [<value>, <value>+]}
+<value> -> {"floor": [<value>]}
+<value> -> {"ceil": [<value>]}
+<value> -> {"mode": [<values>]} # returns the most frequent element in <values>
+<value> -> {"mad": [<values>]} # returns the mean absolute deviation of <values>
+<value> -> {"moment": [<values>, <value>]} # returns the <value>-th standardized moment of <values>
+<value> -> {"count": [<selection>]}  # returns number of selected objects
+<value> -> {"distinct": [<values>]}  # returns number of distinct values in <values> in the selected objects
+<value> -> {"apply": [<value>, <selection>]}  # returns a single feature value for the selection of objects
+<value> -> {"add": [<value>, <value>+]} | {"add": [<values>]}
+<value> -> {"subtract": [<value>, <value>]}
+<value> -> {"multiply": [<value>, <value>+]} | {"multiply": [<values>]}
+<value> -> {"divide": [<value>, <value>]}
+<value> -> {"log": [<value>]}
+<value> -> {"exp": [<value>]}
+<value> -> {"entropy": [<values>]}
+<value> -> {"get": [<value>, <values>]} | {"get": [<value>, <value>]}  # gets the <value>-th element of the second argument (if the second argument is also <value>, the elements are bits)
+<value> -> {"ifelse": [<logic>, <value>, <value>]}  # if the condition is true, return the first argument else the second
+<value> -> {"left_shift": [<value>, <value>]}  # shift the bits in the first value left by the second value
+<value> -> {"right_shift": [<value>, <value>]}  # shift the bits in the first value right by the second value
+# end
+
+# values
+# <values> outputs a list of <value>
+<values> -> {"map": [<down>, <selection>]}  # returns a feature value for each object in selection
+<values> -> {"slice": [<value>, <value>, <values>]} | {"slice": [<value>, <value>, <value>]}  # gets third_argument[first_argument, second_argument] (if the third argument is also <value>, the elements are bits); indexing is like in Python
+<values> -> {"quantile_range": [<values>, <value>, <value>]} # e.g. {"quantile_range": [<values>, 0, 0.25]} returns all values in the first quartile
+<values> -> {"flat_map": [<down2>, <selection>]} | {"flat_map": [<down2>, <selection>, <selection>]}  # only applicable for flow-aggregations; just one selection applies same selection for both flows and packets; two selections applies the 1st selection for flows and the second for packets
+<values> -> <down>  # features from one level-down (in flows, packet features; in flow-aggregations, flow features)
+# end
+
+# selection
+# <selection> outputs a list of objects (packets, flows or aggregations, depending on what kind of feature is used)
+<selection> -> {"select": [<logic-down>]}
+<selection> -> {"select_slice": [<value>, <value>]} | {"select_slice": [<value>, <value>, <selection>]}  # selects a slice from the first value to the second value, with Python-like indexing (if a <selection is not provided, default to selecting everything)
+<selection> -> "forward" | "backward"  # special cases for selection; select objects in the forward (or backward) direction
+# end
+
+# logic
+# <logic> is used for selection, should be evaluated for each object
+<logic> -> {"and": [<logic>+]} 
+<logic> -> {"or": [<logic>+]}
+<logic> -> {"geq": [<value>, <value>]}
+<logic> -> {"leq": [<value>, <value>]}
+<logic> -> {"less": [<value>, <value>]}
+<logic> -> {"greater": [<value>, <value>]}
+<logic> -> {"equal": [<value>, <value>]}
+<logic> -> true | false
+<logic-down> -> {"and": [<logic-down>+]} 
+<logic-down> -> {"or": [<logic-down>+]}
+<logic-down> -> {"geq": [<down>, <value>]}
+<logic-down> -> {"leq": [<down>, <value>]}
+<logic-down> -> {"less": [<down>, <value>]}
+<logic-down> -> {"greater": [<down>, <value>]}
+<logic-down> -> {"equal": [<down>, <value>]}
+<logic-down> -> true | false
+# end
+
