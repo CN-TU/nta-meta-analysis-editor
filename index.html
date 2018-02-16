@@ -14,12 +14,14 @@
     </head>
     <body>
         <button id="text">Text-Mode</button><button id="ntarc">JSON-Mode</button><br>
-        <div id="input" style="height: 200px">count(quantile_range(octetTotalCount / _flowDurationSeconds, 0.05, 0.1));</div><br>
+        <div id="input" style="height: 200px"></div>
         <script src="node_modules/ace-builds/src-noconflict/ace.js"></script>
         <script src="node_modules/ace-builds/src-noconflict/ext-language_tools.js"></script>
         <script src="mode-ntarc-feature.js"></script>
         <script>
-          var context = "flows";
+          const {remote} = require('electron');
+          const {ntarc_feature, ntarc_context, ntarc_base_path} = remote.getCurrentWindow();
+          const {feature2text, text2feature} = require('./features.js')(ntarc_base_path);
 
           var result = document.getElementById("result");
           var editor = ace.edit("input");
@@ -32,16 +34,17 @@
           var EditSession = ace.require('ace/edit_session').EditSession;
 
           var textSession = new EditSession("");
-          textSession.$ntarc_context = context;
-          textSession.setMode('ntarc-feature');
+
+          require('./mode-ntarc-feature.js')(ntarc_base_path, ntarc_context); //this is a bit hacky - but I don't know a better way :(
+          var ntarcMode = ace.require('ntarc-feature').Mode;
+          textSession.setMode(new ntarcMode());
+
+          textSession.setValue(JSON.parse(ntarc_feature).map(feature => { return feature2text(feature);}).join(";\n"));
 
           editor.setSession(textSession);
 
           var ntarcSession = new EditSession("");
           ntarcSession.setMode('ace/mode/json');
-
-
-          const {feature2text, text2feature} = require('./features.js')('.');
 
           var mode="text";
 
@@ -61,8 +64,9 @@
             if(mode=="ntarc")
               return;
             try {
-              ntarcSession.setValue(JSON.stringify(textSession.getValue().split(';').map(feature => { return text2feature(feature, [], context);}).filter(feature => { return feature!==null;}), null, 2));
+              ntarcSession.setValue(JSON.stringify(textSession.getValue().split(';').map(feature => { return text2feature(feature, [], ntarc_context);}).filter(feature => { return feature!==null;}), null, 2));
             } catch(e) {
+              console.log(e);
               alert("Invalid Text");
               return;
             }
