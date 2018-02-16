@@ -93,7 +93,7 @@ function updateAvailable(sha, tag) {
     })
     if (result == 0) {
         download({
-            url: API_URL + PROJECT + 'tarball/'+tag,
+            url: API_URL + PROJECT + '/tarball/'+tag,
             dir: base_path,
             extractOpts: {
                 ignore: (_, header) => {
@@ -118,7 +118,7 @@ function updateAvailable(sha, tag) {
             dialog.showMessageBox({
                 "type": "error",
                 "title": "Error during download",
-                "message": err,
+                "message": err.toString(),
                 "buttons": ["Ok"]
             });
         });
