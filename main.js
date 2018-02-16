@@ -200,6 +200,7 @@ ipcMain.on('launchEditor', (event, id, which, feature, context) => {
             nodeIntegrationInWorker: true
         }
     });
+    featureWindow.setMenu(null);
     featureWindow.ntarc_id = event.sender.id;
     featureWindow.ntarc_which = which;
     featureWindow.ntarc_feature = feature;
@@ -210,8 +211,6 @@ ipcMain.on('launchEditor', (event, id, which, feature, context) => {
         protocol: 'file:',
         slashes: true
     }));
-    featureWindow.setMenu(null);
-    featureWindow.openDevTools();
 });
 
 ipcMain.on('editorResult', (event, id, which, feature) => {
