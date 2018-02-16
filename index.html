@@ -44,24 +44,6 @@
         </div>
     </div>
   </nav>
-
-    <div class="modal" id="working" tabindex="-1" role="dialog" aria-labelledby="Working...">
-        <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h4 class="modal-title">Working...</h4>
-                </div>
-                <div class="modal-body">
-                    <div class="progress">
-                        <div class="progress-bar active progress-bar-striped" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%;">
-                            <span class="sr-only">Working...</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    
     <div class="container-fluid" role="main">
         <ul class="nav nav-tabs" role="tablist">
             <li role="presentation" class="active"><a href="#gui" aria-controls="gui" role="tab" data-toggle="tab">GUI</a></li>
@@ -139,13 +121,6 @@
         function fileNew() {
             ipcRenderer.send("fileNew")
         }
-        function working(fun) {
-            $('#working').modal();
-            setTimeout(() => {
-                fun()
-                $('#working').modal('hide');
-            }, 10);
-        }
         function fileOpen() {
             files = dialog.showOpenDialog({
                     "title": "Open paper",
@@ -155,11 +130,9 @@
                     "properties": ["openFile"]})
             if (files !== undefined) {
                 if ((filename === null) && !fileChanged) {
-                    working(() => {
-                        setFilename(files[0])
-                        neweditor(JSON.parse(fs.readFileSync(files[0], 'utf8'))) //errorhandling!
-                        noChange()
-                    })
+                    setFilename(files[0])
+                    neweditor(JSON.parse(fs.readFileSync(files[0], 'utf8'))) //errorhandling!
+                    noChange()
                 } else {
                     ipcRenderer.send("fileOpen", files[0])
                 }
@@ -169,12 +142,10 @@
             if (filename == null) {
                 return;
             }
-            working(() => {
-                fs.writeFileSync(filename, JSON.stringify(editor.getValue(), null, 2), {
-                    "encoding": "utf8"
-                })
-                noChange()
+            fs.writeFileSync(filename, JSON.stringify(editor.getValue(), null, 2), {
+                "encoding": "utf8"
             })
+            noChange()
         }
         function fileSaveAs() {
             file = dialog.showSaveDialog({
@@ -243,11 +214,9 @@
 
         if (window.location.search != "") {
             filename = window.location.search.substr(1)
-            working(() => {
-                setFilename(filename)
-                neweditor(JSON.parse(fs.readFileSync(filename, 'utf8'))) //errorhandling!
-                noChange()
-            })
+            setFilename(filename)
+            neweditor(JSON.parse(fs.readFileSync(filename, 'utf8'))) //errorhandling!
+            noChange()
         } else {
             neweditor();
             setFilename(null);
