@@ -1,6 +1,6 @@
 {
   "name": "paper-editor",
-  "version": "2.0.0-rc.1",
+  "version": "2.0.0",
   "main": "main.js",
   "author": {
     "name": "Gernot Vormayr",
