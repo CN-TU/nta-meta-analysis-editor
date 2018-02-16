@@ -1,5 +1,20 @@
-<down> -> <value>  # (packet, flow, flow-agg) can use this rule (0, 1, 2) times
-<down2> -> <down>  # only applicable for flow-aggregations; goes down twice (same as executing down->value rule twice)
+# Design notes:
+#
+# - why <values> -> <down>?
+#   * you can have mean(base-feature)
+# - why not <down> in mean?
+#   * wouldn't allow map
+# - why not <values> in map?
+#   * would allow for map(map(map(map(...
+# - why not <value> in map?
+#   * would allow for mean(map(mean(map(mean(...
+# - why {"minimum": [<value>]} not allowed?
+#   * {"minimum": [<values>]} needs <down> to reach <value>, but {"minimum": [<value>]} would bypass needing <down>
+#
+#######
+
+#! <down> -> <value>  # (packet, flow, flow-agg) can use this rule (0, 1, 2) times
+#! <down2> -> <down>  # only applicable for flow-aggregations; goes down twice (same as executing down->value rule twice)
 
 <value> -> <free-integer> | <base-feature> | <free-float> | <logic>
 
