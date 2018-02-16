@@ -62,7 +62,7 @@
   },
   "devDependencies": {
     "electron": "^1.8.2",
-    "electron-builder": "^18.8.1",
+    "electron-builder": "^20.0.5",
     "pegjs": "^0.10.0"
   },
   "scripts": {
