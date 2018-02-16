@@ -1,6 +1,6 @@
-const { feature2text, text2feature } = require('./features.js')('.');
+node_require = require;
 importScripts('./worker.js');
-require('node_modules/ace-builds/src-noconflict/ace');
+require('node_modules/ace-builds/src-min-noconflict/ace');
 
 ace.define("ace/worker/mirror", ["require", "exports", "module", "ace/range", "ace/document", "ace/lib/lang"], function (require, exports, module) {
     "use strict";
@@ -70,10 +70,12 @@ ace.define("ntarc_worker", function (require, exports, module) {
     var oop = require("ace/lib/oop");
     var Mirror = require("ace/worker/mirror").Mirror;
     var context;
+    var feature2text, text2feature;
 
     var WorkerModule = exports.WorkerModule = function (sender) {
         sender.on("setContext", function(e) {
-            context = e.data;
+            context = e.data.context;
+            ({ feature2text, text2feature } = node_require('./features.js')(e.data.base_path));
         });
         Mirror.call(this, sender);
         this.setTimeout(500);

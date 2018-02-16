@@ -62,7 +62,7 @@ module.exports = function(base_path, context) {
                 var worker = new MyWorkerClient();
                 
                 var markers = new Map();
-                worker.emit("setContext", {data: context});
+                worker.emit("setContext", {data: {context:context, base_path:base_path}});
 
                 worker.attachToDocument(session.getDocument());
 
