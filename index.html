@@ -15,6 +15,9 @@
             font-size: 14px;
             font-weight: 100;
         }
+        button#feature_editor_button {
+            margin-left: 6px;
+        }
     </style>
   </head>
   <body>
@@ -81,6 +84,25 @@
         var schema = JSON.parse(fs.readFileSync(path.join(__dirname, 'schema_v2.json'), 'utf8'))
         var editor = null
 
+        function featuresChanged(context) {
+            for(let row of editor.getEditor('root.preprocessing.'+context).rows) {
+                let subeditor = editor.getEditor(row.path+'.features');
+                if(subeditor.switcher.nextSibling.id == "feature_editor_button")
+                    continue;
+                let btn = document.createElement('button');
+                btn.classList.add('btn', 'btn-default');
+                btn.id = "feature_editor_button";
+                btn.textContent = "Feature Editor";
+                btn.onclick = function() {
+                    ipcRenderer.send('launchEditor', remote.getCurrentWindow().id, subeditor.path, JSON.stringify(subeditor.getValue()), context);
+                }
+                subeditor.switcher.after(btn);
+            }
+        }
+        ipcRenderer.on('change-feature', (event, which, feature) => {
+            editor.getEditor(which).setValue(JSON.parse(feature));
+        });
+
         function somethingChanged() {
             if (loading) {
                 loading = false;
@@ -103,6 +125,10 @@
                     theme: 'bootstrap3',
                     iconlib: 'bootstrap3',
                     });
+            for(let context of ["packets", "flows", "flow_aggregations"]) {
+                featuresChanged(context);
+                editor.watch('root.preprocessing.'+context, function() { featuresChanged(context); });
+            }
             loading = true;
             editor.on('change', somethingChanged);
             noChange();

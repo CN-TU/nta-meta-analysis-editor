@@ -1,4 +1,4 @@
-const {app, BrowserWindow, ipcMain, dialog, net} = require('electron')
+const {app, BrowserWindow, ipcMain, dialog, net, webContents} = require('electron')
 const path = require('path')
 const url = require('url')
 const https = require('https')
@@ -11,21 +11,7 @@ const DL_URL = "https://raw.githubusercontent.com/"
 
 var windows = {}
 var helpwindow = null
-
-function openFeatureEditor(feature, context, base_path) {
-    var featureWindow = new BrowserWindow({
-        width: 800,
-        height: 600,
-        webPreferences: {
-            nodeIntegrationInWorker: true
-        }
-    });
-    featureWindow.ntarc_feature = feature;
-    featureWindow.ntarc_context = context;
-    featureWindow.ntarc_base_path = base_path;
-    featureWindow.loadURL('file://' + __dirname + '/index.html');
-    featureWindow.openDevTools();
-}
+const base_path = '.'
 
 function displayHelp(url) {
     if (helpwindow === null) {
@@ -165,6 +151,35 @@ ipcMain.on('fileNew', () => {
 ipcMain.on('fileOpen', (event, arg) => {
     createWindow(arg)
 })
+
+ipcMain.on('launchEditor', (event, id, which, feature, context) => {
+    let featureWindow = new BrowserWindow({
+        title: "Feature Editor - "+context,
+/*        width: 800,
+        height: 600,*/
+        modal: true,
+        parent: windows[id],
+        webPreferences: {
+            nodeIntegrationInWorker: true
+        }
+    });
+    featureWindow.ntarc_id = event.sender.id;
+    featureWindow.ntarc_which = which;
+    featureWindow.ntarc_feature = feature;
+    featureWindow.ntarc_context = context;
+    featureWindow.ntarc_base_path = base_path;
+    featureWindow.loadURL(url.format({
+        pathname: path.join(__dirname, "feature_editor.html"),
+        protocol: 'file:',
+        slashes: true
+    }));
+    featureWindow.setMenu(null);
+    featureWindow.openDevTools();
+});
+
+ipcMain.on('editorResult', (event, id, which, feature) => {
+    webContents.fromId(id).send('change-feature', which, feature);
+});
 
 app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') {

@@ -12,14 +12,14 @@
         </style>
     </head>
     <body>
-        <button id="text">Text-Mode</button><button id="ntarc">JSON-Mode</button><br>
+        <button id="text">Text-Mode</button><button id="ntarc">JSON-Mode</button><button id="ok">Finished</button><br>
         <div id="input" style="height: 200px"></div>
         <script src="node_modules/ace-builds/src-noconflict/ace.js"></script>
         <script src="node_modules/ace-builds/src-noconflict/ext-language_tools.js"></script>
         <script src="mode-ntarc-feature.js"></script>
         <script>
-          const {remote} = require('electron');
-          const {ntarc_feature, ntarc_context, ntarc_base_path} = remote.getCurrentWindow();
+          const {remote, ipcRenderer} = require('electron');
+          const {ntarc_feature, ntarc_context, ntarc_base_path, ntarc_id, ntarc_which} = remote.getCurrentWindow();
           const {feature2text, text2feature} = require('./features.js')(ntarc_base_path);
 
           var result = document.getElementById("result");
@@ -71,6 +71,18 @@
             }
             editor.setSession(ntarcSession);
             mode = "ntarc";
+          };
+          document.getElementById('ok').onclick = () => {
+            let ret;
+            try {
+              ret = JSON.stringify(textSession.getValue().split(';').map(feature => { return text2feature(feature, [], ntarc_context);}).filter(feature => { return feature!==null;}), null, 2);
+            } catch(e) {
+              console.log(e);
+              alert("Invalid Text");
+              return;
+            }
+            ipcRenderer.send('editorResult', ntarc_id, ntarc_which, ret);
+            remote.getCurrentWindow().close();
           };
       </script>
     </body>
