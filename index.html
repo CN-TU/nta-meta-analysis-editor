@@ -97,6 +97,9 @@
                 btn.id = "feature_editor_button";
                 btn.textContent = "Feature Editor";
                 btn.onclick = function() {
+                    if (subeditor.getValue() === null) {
+                        subeditor.setValue([]);
+                    }
                     ipcRenderer.send('launchEditor', remote.getCurrentWindow().id, subeditor.path, JSON.stringify(subeditor.getValue()), context);
                 }
                 subeditor.switcher.after(btn);
