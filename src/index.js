@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import JSONEditor from './rjson-editor/src/Editor';
+import JSONEditor from 'rjson-editor/dist/rjson-editor.js';
 import schema from './schema_v2.json';
 
 import { File, Save, Copy, Folder } from 'react-feather';
