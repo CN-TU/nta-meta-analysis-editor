@@ -42,15 +42,15 @@ function createWindow (filename) {
     const id = win.id
     windows[id] = win
 
-    win.loadURL(url.format({
-        pathname: path.join(__dirname, "index.html"),
+    win.ntarc_filename = filename;
+    win.loadURL(process.env.ELECTRON_START_URL || url.format({
+        pathname: path.join(__dirname, "build/index.html"),
         protocol: 'file:',
-        slashes: true,
-        search: filename
+        slashes: true
     }))
 
     win.webContents.on('will-navigate', (event, url) => {
-        if (url.startsWith('http://') || url.startsWith('https://')) {
+        if ((url.startsWith('http://') || url.startsWith('https://')) && !url.startsWith(process.env.ELECTRON_START_URL)) {
             event.preventDefault()
             displayHelp(url)
         }
