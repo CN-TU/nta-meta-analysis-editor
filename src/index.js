@@ -46,7 +46,7 @@ class MainWindow extends Component {
     constructor(props) {
         super(props);
 
-        var value = undefined;
+        var value = {};
         if (props.filename !== undefined)
             value = MainWindow.loadFile(props.filename)
         this.state = {
