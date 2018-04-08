@@ -34,7 +34,7 @@ class NavButton extends Component {
         return (
             <div>
                 <a href={this.props.url} onClick={this.props.click} className={changed}>
-                    <div><Icon size={48} strokeWidth={1} /></div>
+                    <div><Icon /></div>
                     <div className={flash}>{this.props.text}</div>
                 </a>
             </div>

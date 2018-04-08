@@ -46,6 +46,12 @@ body {
   margin-bottom: 0.5em;
 }
 
+.leftnav a svg {
+  width: 48px;
+  height: 48px;
+  stroke-width: 0.75;
+}
+
 .actionDone {
   animation: blinker 0.2s linear infinite;
 }
