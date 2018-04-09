@@ -155,6 +155,17 @@ class MainWindow extends Component {
 
     render() {
         document.title = "Paper editor - " + (this.state.filename || "new file");
+        const defaults = {
+            optionalPropertiesTrue: true,
+            collapsed: (path) => {
+                const p = path.split('.');
+                if (p[p.length-1] === "features")
+                    return true
+                if (p.length > 2)
+                    return true
+                return false
+            }
+        };
         return (
             <React.Fragment>
                 <div className="leftnav py-2">
@@ -164,7 +175,7 @@ class MainWindow extends Component {
                     <NavButton icon={Copy} url="#saveAs" text="Save as" click={this.fileSaveAs} />
                 </div>
                 <div className="pt-2 pl-2 main">
-                    <JSONEditor schema={schema} value={this.state.value} ref={this.editor} onEdit={this.onEdit} />
+                    <JSONEditor schema={schema} value={this.state.value} ref={this.editor} defaults={defaults} onEdit={this.onEdit} />
                 </div>
             </React.Fragment>
         );
