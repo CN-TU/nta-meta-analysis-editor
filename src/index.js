@@ -14,77 +14,77 @@ const path = window.require('path');
 
 class FeatureEditor extends Component {
     constructor(props) {
-      super(props);
-  
-      this.backdrop = document.createElement("div");
-      this.backdrop.classList.add("modal-backdrop", "show");
-      this.dialog = React.createRef();
-      this.session = null;
-      this.editor = null;
-      this.obj = null;
+        super(props);
+
+        this.backdrop = document.createElement("div");
+        this.backdrop.classList.add("modal-backdrop", "show");
+        this.dialog = React.createRef();
+        this.session = null;
+        this.editor = null;
+        this.obj = null;
     }
-  
+
     close = () => {
-      this.obj = null;
-      const dialog = this.dialog.current;
-      document.body.removeChild(this.backdrop);
-      dialog.classList.remove("show");
-      dialog.style.display = 'none';
-      document.body.classList.remove("modal-open");
+        this.obj = null;
+        const dialog = this.dialog.current;
+        document.body.removeChild(this.backdrop);
+        dialog.classList.remove("show");
+        dialog.style.display = 'none';
+        document.body.classList.remove("modal-open");
     }
-  
+
     ok = () => {
-      try {
-        this.obj.setValue(JSON.parse(this.session.getValue()));
-        this.close();
-      } catch (e) {
-        window.alert("Invalid JSON! " + e);
-      }
+        try {
+            this.obj.setValue(JSON.parse(this.session.getValue()));
+            this.close();
+        } catch (e) {
+            window.alert("Invalid JSON! " + e);
+        }
     }
-  
+
     open = (obj) => {
-      this.obj = obj;
-      this.session.setValue(JSON.stringify(obj.getValue(), null, 2));
-      const dialog = this.dialog.current;
-      dialog.classList.add("show");
-      dialog.style.display = 'block';
-      document.body.appendChild(this.backdrop);
-      document.body.classList.add("modal-open");
+        this.obj = obj;
+        this.session.setValue(JSON.stringify(obj.getValue(), null, 2));
+        const dialog = this.dialog.current;
+        dialog.classList.add("show");
+        dialog.style.display = 'block';
+        document.body.appendChild(this.backdrop);
+        document.body.classList.add("modal-open");
     }
-  
+
     componentDidMount() {
-      var ace = require('brace');
-      require('brace/mode/json');
-      require('brace/theme/github');
-  
-      this.editor = ace.edit('features');
-      this.editor.$blockScrolling = Infinity;
-      this.session = this.editor.getSession();
-      this.session.setMode('ace/mode/json');
-      this.editor.setTheme('ace/theme/github');
+        var ace = require('brace');
+        require('brace/mode/json');
+        require('brace/theme/github');
+
+        this.editor = ace.edit('features');
+        this.editor.$blockScrolling = Infinity;
+        this.session = this.editor.getSession();
+        this.session.setMode('ace/mode/json');
+        this.editor.setTheme('ace/theme/github');
     }
-  
+
     render() {
-      return (
-        <div className="modal" tabIndex="-1" role="dialog" ref={this.dialog}>
-          <div className="modal-dialog raw-dialog" role="document">
-            <div className="modal-content raw-content">
-              <div className="modal-header">
-                <h5 className="modal-title">Edit Features</h5>
-                <button type="button" className="close" onClick={this.close}>
-                  <span>&times;</span>
-                </button>
-              </div>
-              <div className="modal-body" id="features"></div>
-              <div className="modal-footer">
-                <button type="button" className="btn btn-primary" onClick={this.ok}><CheckCircle /> Modify</button>
-                <button type="button" className="btn btn-secondary" onClick={this.close}><XCircle /> Cancel</button>
-              </div>
-            </div>
-          </div>
-        </div>)
+        return (
+            <div className="modal" tabIndex="-1" role="dialog" ref={this.dialog}>
+                <div className="modal-dialog raw-dialog" role="document">
+                    <div className="modal-content raw-content">
+                        <div className="modal-header">
+                            <h5 className="modal-title">Edit Features</h5>
+                            <button type="button" className="close" onClick={this.close}>
+                                <span>&times;</span>
+                            </button>
+                        </div>
+                        <div className="modal-body" id="features"></div>
+                        <div className="modal-footer">
+                            <button type="button" className="btn btn-primary" onClick={this.ok}><CheckCircle /> Modify</button>
+                            <button type="button" className="btn btn-secondary" onClick={this.close}><XCircle /> Cancel</button>
+                        </div>
+                    </div>
+                </div>
+            </div>)
     }
-  }
+}
 
 class NavButton extends Component {
     constructor(props) {
@@ -234,13 +234,13 @@ class MainWindow extends Component {
 
     onConstruct = (path, cmds) => {
         const p = path.split('.');
-        if (p[p.length-1] !== "features")
+        if (p[p.length - 1] !== "features")
             return;
         cmds.addPostcontrol("EditFeature", -2000, (
             <button type="button"
-            key="editFeature"
-            className="btn btn-sm btn-outline-primary ml-2"
-            onClick={this.openModal.bind(this, cmds)}><Edit /> Features</button>
+                key="editFeature"
+                className="btn btn-sm btn-outline-primary ml-2"
+                onClick={this.openModal.bind(this, cmds)}><Edit /> Features</button>
         ))
     }
 
@@ -250,7 +250,7 @@ class MainWindow extends Component {
             optionalPropertiesTrue: true,
             collapsed: (path) => {
                 const p = path.split('.');
-                if (p[p.length-1] === "features")
+                if (p[p.length - 1] === "features")
                     return true
                 if (p.length > 2)
                     return true
@@ -282,4 +282,4 @@ class MainWindow extends Component {
 ReactDOM.render(<MainWindow
     filename={remote.getCurrentWindow().ntarc_filename}
     schema={JSON.parse(fs.readFileSync(path.join(remote.getCurrentWindow().ntarc_base_path, 'schema_v2.json'), 'utf8'))}
-     />, document.getElementById('root'));
+/>, document.getElementById('root'));
