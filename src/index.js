@@ -3,7 +3,6 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import JSONEditor from 'rjson-editor';
-import schema from './schema_v2.json';
 
 import { File, Save, Copy, Folder } from 'react-feather';
 
@@ -175,11 +174,14 @@ class MainWindow extends Component {
                     <NavButton icon={Copy} url="#saveAs" text="Save as" click={this.fileSaveAs} />
                 </div>
                 <div className="pt-2 pl-2 main">
-                    <JSONEditor schema={schema} value={this.state.value} ref={this.editor} defaults={defaults} onEdit={this.onEdit} />
+                    <JSONEditor schema={this.props.schema} value={this.state.value} ref={this.editor} defaults={defaults} onEdit={this.onEdit} />
                 </div>
             </React.Fragment>
         );
     }
 }
 
-ReactDOM.render(<MainWindow filename={remote.getCurrentWindow().ntarc_filename} />, document.getElementById('root'));
+ReactDOM.render(<MainWindow
+    filename={remote.getCurrentWindow().ntarc_filename}
+    schema={JSON.parse(fs.readFileSync(path.join(remote.getCurrentWindow().ntarc_base_path, 'schema_v2.json'), 'utf8'))}
+     />, document.getElementById('root'));

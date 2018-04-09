@@ -172,8 +172,8 @@ app.on('ready', () => {
     if (needFix) {
         fs.mkdirSync(base_path);
         for(let f of needed)
-            copy(path.join(__dirname, f), path.join(base_path, f))
-        copy(path.join(__dirname, 'commit.json'), path.join(base_path, 'commit.json'))
+            copy(path.join(__dirname, 'spec', f), path.join(base_path, f))
+        copy(path.join(__dirname, 'spec', 'commit.json'), path.join(base_path, 'commit.json'))
     }
 
     createWindow()
