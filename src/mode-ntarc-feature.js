@@ -1,12 +1,11 @@
-module.exports = function(base_path, context) {
-    const features = require('./features.js')(base_path, context);
-    ace.define('ntarc-feature', function (require, exports, module) {
+module.exports = function(ace, features, base_path) {
+    ace.define('ntarc-feature', [], function (acequire, exports, module) {
 
-        var oop = require("ace/lib/oop");
-        var config = require("ace/config");
-        var TextMode = require("ace/mode/text").Mode;
-        var Range = require('ace/range').Range;
-        var NTARCHighlightRules = require("ntarc_highlight_rules").NTARCHighlightRules;
+        var oop = acequire("ace/lib/oop");
+        var config = acequire("ace/config");
+        var TextMode = acequire("ace/mode/text").Mode;
+        var Range = acequire('ace/range').Range;
+        var NTARCHighlightRules = acequire("ntarc_highlight_rules").NTARCHighlightRules;
         var completions = [];
 
         for (var key of features.specification.functions.keys()) {
@@ -34,35 +33,15 @@ module.exports = function(base_path, context) {
             })
         }
 
-        var WorkerClient = require("ace/worker/worker_client").WorkerClient;
+        var WorkerClient = acequire("ace/worker/worker_client").WorkerClient;
 
         var Mode = function () {
             this.HighlightRules = NTARCHighlightRules;
             this.createWorker = function (session) {
-                MyWorkerClient = function(){
-                    this.$sendDeltaQueue = this.$sendDeltaQueue.bind(this);
-                    this.changeListener = this.changeListener.bind(this);
-                    this.onMessage = this.onMessage.bind(this);
-
-                    this.$worker = new Worker('worker-ntarc.js');
-
-                    this.$worker.postMessage({
-                        init: true,
-                        tlns: undefined,
-                        module: "ntarc_worker",
-                        classname: "WorkerModule"
-                    });
-
-                    this.callbackId = 1;
-                    this.callbacks = {};
-
-                    this.$worker.onmessage = this.onMessage;
-                }
-                MyWorkerClient.prototype = WorkerClient.prototype;
-                var worker = new MyWorkerClient();
+                var worker = new WorkerClient(["ace"], require("./worker-ntarc"), "Worker");
                 
                 var markers = new Map();
-                worker.emit("setContext", {data: {context:context, base_path:base_path}});
+                worker.emit("setBasePath", {data: base_path});
 
                 worker.attachToDocument(session.getDocument());
 
@@ -71,6 +50,7 @@ module.exports = function(base_path, context) {
                     let markers = [];
                     for(let i=0;i<results.data.markers.length;i++) {
                         let r = results.data.markers[i].range;
+                        console.log(r);
                         markers.push({
                             range : new Range(...r),
                             type : "text",
@@ -102,10 +82,10 @@ module.exports = function(base_path, context) {
         exports.Mode = Mode;
     });
 
-    ace.define('ntarc_highlight_rules', function (require, exports, module) {
+    ace.define('ntarc_highlight_rules', function (acequire, exports, module) {
 
-        var oop = require("ace/lib/oop");
-        var TextHighlightRules = require("ace/mode/text_highlight_rules").TextHighlightRules;
+        var oop = acequire("ace/lib/oop");
+        var TextHighlightRules = acequire("ace/mode/text_highlight_rules").TextHighlightRules;
 
         var NTARCHighlightRules = function () {
             let iana = new Set(features.iana_ies);

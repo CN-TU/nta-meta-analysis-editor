@@ -1,87 +1,23 @@
-node_require = require;
-importScripts('./worker.js');
-require('node_modules/ace-builds/src-min-noconflict/ace');
-
-ace.define("ace/worker/mirror", ["require", "exports", "module", "ace/range", "ace/document", "ace/lib/lang"], function (require, exports, module) {
+ace.define("ntarc_worker", [], function (acequire, exports, module) {
     "use strict";
 
-    var Range = require("../range").Range;
-    var Document = require("../document").Document;
-    var lang = require("../lib/lang");
+    var oop = acequire("ace/lib/oop");
+    var Mirror = acequire("ace/worker/mirror").Mirror;
+    var context = 'flow';
+    var text2feature;
 
-    var Mirror = exports.Mirror = function (sender) {
-        this.sender = sender;
-        var doc = this.doc = new Document("");
-
-        var deferredUpdate = this.deferredUpdate = lang.delayedCall(this.onUpdate.bind(this));
-
-        var _self = this;
-        sender.on("change", function (e) {
-            var data = e.data;
-            if (data[0].start) {
-                doc.applyDeltas(data);
-            } else {
-                for (var i = 0; i < data.length; i += 2) {
-                    if (Array.isArray(data[i + 1])) {
-                        var d = { action: "insert", start: data[i], lines: data[i + 1] };
-                    } else {
-                        var d = { action: "remove", start: data[i], end: data[i + 1] };
-                    }
-                    doc.applyDelta(d, true);
-                }
-            }
-            if (_self.$timeout)
-                return deferredUpdate.schedule(_self.$timeout);
-            _self.onUpdate();
+    var Worker = exports.Worker = function (sender) {
+        sender.on("setBasePath", function (e) {
+            text2feature = require('./features.js')(e.data).text2feature;
         });
-    };
-
-    (function () {
-
-        this.$timeout = 500;
-
-        this.setTimeout = function (timeout) {
-            this.$timeout = timeout;
-        };
-
-        this.setValue = function (value) {
-            this.doc.setValue(value);
-            this.deferredUpdate.schedule(this.$timeout);
-        };
-
-        this.getValue = function (callbackId) {
-            this.sender.callback(this.doc.getValue(), callbackId);
-        };
-
-        this.onUpdate = function () {
-        };
-
-        this.isPending = function () {
-            return this.deferredUpdate.isPending();
-        };
-
-    }).call(Mirror.prototype);
-
-});
-
-ace.define("ntarc_worker", function (require, exports, module) {
-    "use strict";
-
-    var oop = require("ace/lib/oop");
-    var Mirror = require("ace/worker/mirror").Mirror;
-    var context;
-    var feature2text, text2feature;
-
-    var WorkerModule = exports.WorkerModule = function (sender) {
-        sender.on("setContext", function(e) {
-            context = e.data.context;
-            ({ feature2text, text2feature } = node_require('./features.js')(e.data.base_path));
+        sender.on("setContext", function (e) {
+            context = e.data;
         });
         Mirror.call(this, sender);
         this.setTimeout(500);
     };
 
-    oop.inherits(WorkerModule, Mirror);
+    oop.inherits(Worker, Mirror);
 
     (function () {
         this.onUpdate = function () {
@@ -98,7 +34,7 @@ ace.define("ntarc_worker", function (require, exports, module) {
                 let next_column = lines[lines.length - 1].length;
                 try {
                     text2feature(features[i], current_warnings, context);
-                    for(let j=0; j<current_warnings.length; j++) {
+                    for (let j = 0; j < current_warnings.length; j++) {
                         let error = {
                             row: current_warnings[j].location.start.line - 1 + current_line,
                             column: current_warnings[j].location.start.column - 1 + (current_warnings[j].location.start.line == 1 ? current_column : 0),
@@ -112,7 +48,7 @@ ace.define("ntarc_worker", function (require, exports, module) {
                             type: "warning"
                         }
                         errors.push(error);
-                        if(j==0) {
+                        if (j == 0) {
                             markers.push(error);
                         }
                     }
@@ -142,6 +78,6 @@ ace.define("ntarc_worker", function (require, exports, module) {
                 markers: markers
             });
         };
-    }).call(WorkerModule.prototype);
+    }).call(Worker.prototype);
 
 });

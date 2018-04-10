@@ -44,8 +44,13 @@ function displayHelp(url) {
     helpwindow.focus();
 }
 
-function createWindow (filename) {
-    win = new BrowserWindow()
+function createWindow(filename) {
+    win = new BrowserWindow({
+        title: "Paper Editor",
+        webPreferences: {
+            nodeIntegrationInWorker: true
+        }
+    })
     win.ntarc_base_path = base_path;
     const id = win.id
     windows[id] = win
@@ -195,32 +200,6 @@ ipcMain.on('fileNew', () => {
 ipcMain.on('fileOpen', (event, arg) => {
     createWindow(arg)
 })
-
-ipcMain.on('launchEditor', (event, id, which, feature, context) => {
-    let featureWindow = new BrowserWindow({
-        title: "Feature Editor - "+context,
-        modal: true,
-        parent: windows[id],
-        webPreferences: {
-            nodeIntegrationInWorker: true
-        }
-    });
-    featureWindow.setMenu(null);
-    featureWindow.ntarc_id = event.sender.id;
-    featureWindow.ntarc_which = which;
-    featureWindow.ntarc_feature = feature;
-    featureWindow.ntarc_context = context;
-    featureWindow.ntarc_base_path = base_path;
-    featureWindow.loadURL(url.format({
-        pathname: path.join(__dirname, "feature_editor.html"),
-        protocol: 'file:',
-        slashes: true
-    }));
-});
-
-ipcMain.on('editorResult', (event, id, which, feature) => {
-    webContents.fromId(id).send('change-feature', which, feature);
-});
 
 app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') {

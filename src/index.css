@@ -61,3 +61,12 @@ body {
     background-color: green;
   }
 }
+
+.ntarc_warning {
+  border-bottom: 2px dashed orange;
+  position: absolute;
+}
+.ntarc_error {
+  border-bottom: 3px solid red;
+  position: absolute;
+}

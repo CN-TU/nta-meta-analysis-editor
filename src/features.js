@@ -1,6 +1,9 @@
 const path = require('path');
-const fs = require('fs');
-const csv = require('csv-parse/lib/sync');
+let fs = require('fs');
+// hack for react, which defined that we don't need fs...
+if (fs.readFileSync === undefined)
+    fs = window.require('fs');
+const csv = require('csv-parse/lib/es5/sync');
 
 const MATH = {
     add: '+',

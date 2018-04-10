@@ -12,6 +12,11 @@ const dialog = remote.dialog;
 const fs = window.require('fs');
 const path = window.require('path');
 
+const { ntarc_filename, ntarc_base_path } = remote.getCurrentWindow();
+
+const features = require('./features.js')(ntarc_base_path);
+const { feature2text, text2feature } = features;
+
 class FeatureEditor extends Component {
     constructor(props) {
         super(props);
@@ -22,6 +27,9 @@ class FeatureEditor extends Component {
         this.session = null;
         this.editor = null;
         this.obj = null;
+        this.state = {
+            mode: 'ntarc'
+        }
     }
 
     close = () => {
@@ -34,17 +42,30 @@ class FeatureEditor extends Component {
     }
 
     ok = () => {
+        let result;
         try {
-            this.obj.setValue(JSON.parse(this.session.getValue()));
-            this.close();
+            if (this.state.mode === "ntarc")
+                result = this.textSession.getValue().split(';').map(feature => { return text2feature(feature, [], this.context); }).filter(feature => { return feature !== null; });
+            else
+                result = JSON.parse(this.ntarcSession.getValue());
         } catch (e) {
-            window.alert("Invalid JSON! " + e);
+            alert("Invalid Specification");
+            return;
         }
+
+        this.obj.setValue(result);
+        this.close();
     }
 
-    open = (obj) => {
+    open = (path, obj) => {
         this.obj = obj;
-        this.session.setValue(JSON.stringify(obj.getValue(), null, 2));
+        this.context = path.split('.')[1];
+        this.textSession.$worker.emit("setContext", { data: this.context })
+        this.textSession.setValue(JSON.parse(JSON.stringify(this.obj.getValue())).map(feature => { return feature2text(feature); }).join(";\n"));
+        this.editor.setSession(this.textSession);
+        this.setState({
+            mode: 'ntarc'
+        });
         const dialog = this.dialog.current;
         dialog.classList.add("show");
         dialog.style.display = 'block';
@@ -54,14 +75,53 @@ class FeatureEditor extends Component {
 
     componentDidMount() {
         var ace = require('brace');
-        require('brace/mode/json');
+        require('brace/ext/language_tools')
         require('brace/theme/github');
 
         this.editor = ace.edit('features');
-        this.editor.$blockScrolling = Infinity;
-        this.session = this.editor.getSession();
-        this.session.setMode('ace/mode/json');
         this.editor.setTheme('ace/theme/github');
+        this.editor.$blockScrolling = Infinity;
+        this.editor.setOptions({
+            showPrintMargin: false,
+            enableBasicAutocompletion: true,
+            enableLiveAutocompletion: true
+        })
+
+
+        const EditSession = ace.acequire('ace/edit_session').EditSession;
+
+        this.textSession = new EditSession("");
+        require('./mode-ntarc-feature.js')(ace, features, ntarc_base_path); //this is a bit hacky - but I don't know a better way :(
+        var ntarcMode = ace.acequire('ntarc-feature').Mode;
+        this.textSession.setMode(new ntarcMode());
+        this.editor.setSession(this.textSession);
+
+        this.ntarcSession = new EditSession("");
+        require('brace/mode/json');
+        this.ntarcSession.setMode('ace/mode/json');
+    }
+
+    switchMode = (mode) => {
+        if (this.state === mode)
+            return;
+        if (mode === "json") {
+            try {
+                this.ntarcSession.setValue(JSON.stringify(this.textSession.getValue().split(';').map(feature => { return text2feature(feature, [], this.context); }).filter(feature => { return feature !== null; }), null, 2));
+            } catch (e) {
+                alert("Invalid Text");
+                return;
+            }
+            this.editor.setSession(this.ntarcSession);
+        } else {
+            try {
+                this.textSession.setValue(JSON.parse(this.ntarcSession.getValue()).map(feature => { return feature2text(feature); }).join(";\n"));
+            } catch (e) {
+                alert("Invalid Text");
+                return;
+            }
+            this.editor.setSession(this.textSession);
+        }
+        this.setState({ mode: mode });
     }
 
     render() {
@@ -69,11 +129,21 @@ class FeatureEditor extends Component {
             <div className="modal" tabIndex="-1" role="dialog" ref={this.dialog}>
                 <div className="modal-dialog raw-dialog" role="document">
                     <div className="modal-content raw-content">
-                        <div className="modal-header">
+                        <div className="modal-header" style={{ borderBottom: "none" }}>
                             <h5 className="modal-title">Edit Features</h5>
                             <button type="button" className="close" onClick={this.close}>
                                 <span>&times;</span>
                             </button>
+                        </div>
+                        <div>
+                            <ul className="nav nav-tabs">
+                                <li className="nav-item">
+                                    <a className={"nav-link" + (this.state.mode === "ntarc" ? " active" : "")} href="#NTARC" onClick={this.switchMode.bind(this, "ntarc")} >Features</a>
+                                </li>
+                                <li className="nav-item">
+                                    <a className={"nav-link" + (this.state.mode !== "ntarc" ? " active" : "")} href="#JSON" onClick={this.switchMode.bind(this, "json")}>JSON</a>
+                                </li>
+                            </ul>
                         </div>
                         <div className="modal-body" id="features"></div>
                         <div className="modal-footer">
@@ -228,8 +298,8 @@ class MainWindow extends Component {
         this.saveButton.current.setState({ changed: true });
     }
 
-    openModal = (val) => {
-        this.editModal.current.open(val);
+    openModal = (path, val) => {
+        this.editModal.current.open(path, val);
     }
 
     onConstruct = (path, cmds) => {
@@ -240,7 +310,7 @@ class MainWindow extends Component {
             <button type="button"
                 key="editFeature"
                 className="btn btn-sm btn-outline-primary ml-2"
-                onClick={this.openModal.bind(this, cmds)}><Edit /> Features</button>
+                onClick={this.openModal.bind(this, path, cmds)}><Edit /> Features</button>
         ))
     }
 
@@ -280,6 +350,6 @@ class MainWindow extends Component {
 }
 
 ReactDOM.render(<MainWindow
-    filename={remote.getCurrentWindow().ntarc_filename}
-    schema={JSON.parse(fs.readFileSync(path.join(remote.getCurrentWindow().ntarc_base_path, 'schema_v2.json'), 'utf8'))}
+    filename={ntarc_filename}
+    schema={JSON.parse(fs.readFileSync(path.join(ntarc_base_path, 'schema_v2.json'), 'utf8'))}
 />, document.getElementById('root'));

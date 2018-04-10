@@ -1,4 +1,5 @@
-const {text2feature} = require('./features.js')('.');
+const path = require('path');
+const {text2feature} = require('./features.js')(path.resolve(__dirname, '../spec'));
 
 const readline = require('readline');
 const rl = readline.createInterface({
