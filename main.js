@@ -45,7 +45,7 @@ function displayHelp(url) {
 }
 
 function createWindow(filename) {
-    win = new BrowserWindow({
+    let win = new BrowserWindow({
         title: "Paper Editor",
         webPreferences: {
             nodeIntegrationInWorker: true
@@ -78,8 +78,8 @@ function createWindow(filename) {
 }
 
 function copy(src, dst) {
-    a = fs.openSync(src, 'r')
-    b = fs.openSync(dst, 'w')
+    let a = fs.openSync(src, 'r')
+    let b = fs.openSync(dst, 'w')
     let bytesRead = 1
     let pos = 0
     let _buff = Buffer.alloc(4096)
@@ -94,7 +94,7 @@ function copy(src, dst) {
 }
 
 function updateAvailable(sha, tag) {
-    result = dialog.showMessageBox({
+    const result = dialog.showMessageBox({
         "type": "info",
         "title": "Update available",
         "message": "There is a newer specification available. Update?",
@@ -139,7 +139,7 @@ function updateAvailable(sha, tag) {
 function checkUpdate() {
     let link = url.parse(API_URL + PROJECT + "/tags");
     link.headers = { 'User-Agent': 'CN-TU/nta-meta-analysis-editor updater' };
-    req = net.request(link);
+    let req = net.request(link);
     req.on('response', (response) => {
         if (response.statusCode == 200) {
             var data = ''
