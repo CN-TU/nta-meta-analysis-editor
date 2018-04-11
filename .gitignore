@@ -1,6 +1,8 @@
 node_modules
 dist
-# See https://help.github.com/ignore-files/ for more about ignoring files.
+
+build/asset-manifest.json
+build/service-worker.js
 
 # dependencies
 /node_modules
