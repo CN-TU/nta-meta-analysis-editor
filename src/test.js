@@ -1,6 +1,7 @@
 const VERSION = "v2.1";
 const fs = require('fs');
-const {feature2text, text2feature, specification} = require('./features.js')('.');
+const path_module = require('path');
+const {feature2text, text2feature, specification} = require('./features.js')(path_module.resolve(__dirname, '../spec'));
 
 var args = process.argv.slice(2);
 if (args.length != 1) {

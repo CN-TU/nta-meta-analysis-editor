@@ -41,10 +41,13 @@
 <value> -> {"subtract": [<value>, <value>]}
 <value> -> {"multiply": [<value>, <value>+]} | {"multiply": [<values>]}
 <value> -> {"divide": [<value>, <value>]}
+<value> -> {"pow": [<value>, <value>]}  # raises the first value to the power of the second value (e.g., pow(octetTotalCount, 2) == octetTotalCount^2)
 <value> -> {"log": [<value>]}
 <value> -> {"exp": [<value>]}
 <value> -> {"entropy": [<values>]}
-<value> -> {"get": [<value>, <values>]} | {"get": [<value>, <value>]}  # gets the <value>-th element of the second argument (if the second argument is also <value>, the elements are bits)
+<value> -> {"get": [<value>, <values>]}  # gets the <value>-th element of the second argument; indexing is like in Python
+<value> -> {"get_bits": [<value>, <value>]}  # gets the <value>-th bit of the second argument; indexing is like in Python
+<value> -> {"slice_bits": [<value>, <value>, <value>]}  # gets third_argument[first_argument : second_argument], considering the third argument as an array of bits, and returns it as a value; indexing is like in Python
 <value> -> {"ifelse": [<logic>, <value>, <value>]}  # if the condition is true, return the first argument else the second
 <value> -> {"left_shift": [<value>, <value>]}  # shift the bits in the first value left by the second value
 <value> -> {"right_shift": [<value>, <value>]}  # shift the bits in the first value right by the second value
@@ -53,7 +56,7 @@
 # values
 # <values> outputs a list of <value>
 <values> -> {"map": [<down>, <selection>]}  # returns a feature value for each object in selection
-<values> -> {"slice": [<value>, <value>, <values>]} | {"slice": [<value>, <value>, <value>]}  # gets third_argument[first_argument, second_argument] (if the third argument is also <value>, the elements are bits); indexing is like in Python
+<values> -> {"slice": [<value>, <value>, <values>]}  # gets third_argument[first_argument, second_argument]; indexing is like in Python
 <values> -> {"quantile_range": [<values>, <value>, <value>]} # e.g. {"quantile_range": [<values>, 0, 0.25]} returns all values in the first quartile
 <values> -> {"flat_map": [<down2>, <selection>]} | {"flat_map": [<down2>, <selection>, <selection>]}  # only applicable for flow-aggregations; just one selection applies same selection for both flows and packets; two selections applies the 1st selection for flows and the second for packets
 <values> -> <down>  # features from one level-down (in flows, packet features; in flow-aggregations, flow features)

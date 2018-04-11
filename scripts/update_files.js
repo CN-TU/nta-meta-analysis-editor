@@ -1,5 +1,5 @@
 const download = require('download-tarball');
-const {PROJECT, API_URL, needed} = require('./config.js');
+const {PROJECT, API_URL, needed} = require('../config.js');
 const https = require('https');
 const url = require('url');
 const fs = require('fs');
@@ -20,10 +20,10 @@ req.on('response', (response) => {
             data = new Map(data.map(tag => {return [tag.name, tag.commit.sha];}));
             let tags = Array.from(data.keys()).sort();
             let latestTag = tags[tags.length - 1];
-            fs.writeFileSync('commit.json', JSON.stringify({sha:data.get(latestTag), tag:latestTag}));
+            fs.writeFileSync('./spec/commit.json', JSON.stringify({sha:data.get(latestTag), tag:latestTag}));
             download({
                 url: API_URL + PROJECT +'/tarball/'+latestTag,
-                dir: '.',
+                dir: './spec/',
                 extractOpts: {
                     ignore: (_, header) => {
                         if(needed.has(header.name)) return false;
