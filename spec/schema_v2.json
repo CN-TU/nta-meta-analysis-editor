@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "type": "object",
   "title": "Paper",
+  "type": "object",
   "required": [
     "version",
     "reference",
@@ -194,7 +194,9 @@
       "title": "missing",
       "type": "string",
       "minLength": 1,
-      "const": "missing"
+      "enum": [
+        "missing"
+      ]
     }
   },
   "properties": {
@@ -202,7 +204,7 @@
       "title": "version",
       "type": "string",
       "propertyOrder": 1,
-      "const": "v2.1"
+      "enum": ["v2.1"]
     },
     "reference": {
       "title": "reference",
@@ -1106,7 +1108,9 @@
                   {
                     "title": "partially",
                     "type": "string",
-                    "const": "partially"
+                    "enum": [
+                      "partially"
+                    ]
                   }
                 ]
               }
