@@ -44,11 +44,11 @@
     "download-tarball": "^1.1.0"
   },
   "devDependencies": {
-    "electron": "^1.8.4",
     "@heroku/foreman": "github:heroku/node-foreman",
     "bootstrap": "^4.1.0",
     "brace": "^0.11.1",
     "csv-parse": "^2.2.0",
+    "electron": "^1.8.4",
     "electron-builder": "^20.8.2",
     "pegjs": "^0.10.0",
     "react": "^16.3.1",
@@ -57,7 +57,7 @@
     "react-dom": "^16.3.1",
     "react-feather": "^1.1.0",
     "react-scripts": "1.1.4",
-    "rjson-editor": "^0.9.11"
+    "rjson-editor": "^0.9.12"
   },
   "scripts": {
     "start": "react-scripts start",
