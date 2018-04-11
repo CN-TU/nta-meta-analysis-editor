@@ -196,7 +196,7 @@ function peg$parse(input, options) {
       peg$c52 = peg$literalExpectation("true", true),
       peg$c53 = "false",
       peg$c54 = peg$literalExpectation("false", true),
-      peg$c55 = function() { return text().toLowerCase() == "true"; },
+      peg$c55 = function() { return text().toLowerCase() === "true"; },
       peg$c56 = peg$otherExpectation("Comment"),
       peg$c57 = "#",
       peg$c58 = peg$literalExpectation("#", false),
@@ -1430,7 +1430,7 @@ function peg$parse(input, options) {
         }
       }
     function down2(context) {
-        if(context == "flow_aggregations")
+        if(context === "flow_aggregations")
           return "packets";
         return false;
     }
@@ -1442,7 +1442,7 @@ function peg$parse(input, options) {
       this.addFunction = function(name, args, ret) {
         args = args[0];
         let id = args.length;
-        if (typeof args[args.length - 1] == "object" && args[args.length - 1].type == "oneormore") {
+        if (typeof args[args.length - 1] === "object" && args[args.length - 1].type === "oneormore") {
           id = 0;
           args[args.length - 1] = args[args.length - 1].term;
         }
@@ -1490,7 +1490,7 @@ function peg$parse(input, options) {
             let variants = this.functions.get(item.name);
             if (variants === undefined) {
               let hint = [];
-              if (item.name == "basedon") {
+              if (item.name === "basedon") {
                 hint.push("'basedon' was removed from the spec. Have a look at 'apply'.");
               }
               err.push(new ParseWarning("Operation '"+item.name+"' not found."+(hint.length > 0 ? [""].concat(hint).join(" ") : ""), item));
@@ -1499,14 +1499,14 @@ function peg$parse(input, options) {
             let ret = [];
             if (variants[n] !== undefined) {
               for(let variant of variants[n]) {
-                if (want == undefined) {
+                if (want === undefined) {
                   ret.push(new ComputedVariant(variant, context));
                 } else {
                    let {ok, newcontext, hint} = this.compareVerbs(variant.ret, want, context);
                    if(ok) {
                      ret.push(new ComputedVariant(variant, newcontext, hint));
                    } else {
-                     if (item.name == "map" && want == "<value>") {
+                     if (item.name === "map" && want === "<value>") {
                        hints.push("Did you mean 'apply'?");
                      }
                      hints = hints.concat(hint);
@@ -1519,7 +1519,7 @@ function peg$parse(input, options) {
                 if (n >= variant.args.length) {
                   let v = variant.args.slice(0,-1);
                   v = v.concat(Array(n-variant.args.length+1).fill(variant.args[variant.args.length - 1]));
-                  if (want == undefined) {
+                  if (want === undefined) {
                     ret.push(new ComputedVariant(new Variant(v, variant.ret), context));
                   } else {
                     let {ok, newcontext, hint} = this.compareVerbs(variant.ret, want, context);
@@ -1533,11 +1533,12 @@ function peg$parse(input, options) {
               }
             }
             return {variants: ret, hints: hints};
+          // no default
         }
       }
       this.compareVerbs = function(a, want, context) {
-        if (want == ANYTHING) return new VerbCheck(true, context);
-        if (a == want) return new VerbCheck(true, context);
+        if (want === ANYTHING) return new VerbCheck(true, context);
+        if (a === want) return new VerbCheck(true, context);
         let hint = [];
         if (this.verbs.has(a)) {
           for(let newa of this.verbs.get(a)) {
@@ -1547,7 +1548,7 @@ function peg$parse(input, options) {
             hint = hint.concat(ret.hint);
           }
         }
-        if(a == "<value>") {
+        if(a === "<value>") {
           let d2ok = down2(context);
           if(d2ok !== false) {
             let ret = this.compareVerbs("<down2>", want, d2ok)
@@ -1571,6 +1572,7 @@ function peg$parse(input, options) {
             case "<values>":
               hint.push("Only possible in 'flow_aggregations' or 'flows', but at this point context is '"+context+"'.");
               break;
+            // no default
           }
         }
         return new VerbCheck(false, context, hint);
@@ -1589,15 +1591,16 @@ function peg$parse(input, options) {
               return this.spec_features.get(item.name);
             }
             return FEATURE;
+          // no default
         }
-        throw "Unknown item";
+        throw new Error("Unknown item");
       }
     }
 
     var defs = new defChecker();
 
     function appendTerm(type, terms) {
-      if (type == "<aggregation-feature>" || type == "<packet-feature>" || type == "<flow-feature>")
+      if (type === "<aggregation-feature>" || type === "<packet-feature>" || type === "<flow-feature>")
         return;
       for(let term of terms) {
         switch(typeof term) {
@@ -1611,6 +1614,7 @@ function peg$parse(input, options) {
                 let key=Object.keys(term)[0];
                 defs.addFunction(key, term[key], type)
                 continue;
+            // no default
         }
       }
     }

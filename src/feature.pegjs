@@ -25,8 +25,9 @@
           return createFakeFeature(base, arg);
         });
         return new parsedFeature(key, args, "operation", base.location, base.name, base.fake);
+      // no default
     }
-    throw "This should never happen";
+    throw new Error("This should never happen");
   }
   function parsedFeature(name, args, type, location, fake, basefake) {
     this.type = type;
@@ -56,8 +57,7 @@
           feature = createFakeFeature(feature, feature_aliases[feature.name]);
       }
       if (feature.args === null) {
-        let warnings = []
-        if(feature.type == "feature") {
+        if(feature.type === "feature") {
           if(feature.name.startsWith('__')) {
             if(!specification.validCustomName(feature.name))
               specerror.push(new ParseWarning("Illegal custom name '"+feature.name+"'. Must start with a lowercase letter and be camel case.", feature));
@@ -77,7 +77,7 @@
         return [new ParseWarning("Wanted "+want+", but '"+feature.name+"' is "+specification.type(feature)+"."+(hint.length > 0 ? [""].concat(hint).join(" ") : ""), feature)];
       } else {
         let {variants, hints} = specification.arguments(feature, want, specerror, context);
-        if (variants.length == 0) {
+        if (variants.length === 0) {
           variants = specification.arguments(feature).variants;
           return [new ParseWarning("Wanted "+want+", but '"+feature.name+"' is "+variants.map(function(variant) {return variant.ret}).join(" or ")+"."+(hints.length > 0 ? [""].concat(hints).join(" ") : ""), feature)];
         }
@@ -166,7 +166,7 @@ Number
   ='-'?([0-9]+[.]?[0-9]*/[.][0-9]+)([eE][+-]?[0-9]+)? { return new parsedFeature(Number(text()), null, "number", location()); }
   
 Bool
-  = ('true'i/'false'i) { return new parsedFeature(text().toLowerCase() == "true", null, "boolean", location()); }
+  = ('true'i/'false'i) { return new parsedFeature(text().toLowerCase() === "true", null, "boolean", location()); }
 
 _ "whitespace"
   = [ \t\n\r]*

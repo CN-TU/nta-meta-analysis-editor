@@ -43,7 +43,7 @@ function fun(op, args) {
     this.op = op;
     this.args = args;
     this.toMath = function () {
-        if (this.args.length == 2) {
+        if (this.args.length === 2) {
             return MATH[this.op];
         }
         return undefined;
@@ -74,11 +74,11 @@ function fun(op, args) {
                 if (top.toMath() === undefined) {
                     this.brace = false;
                 } else {
-                    if ((this.op == "multiply" || this.op == "divide") && (top.op == "add" || top.op == "subtract")) {
+                    if ((this.op === "multiply" || this.op === "divide") && (top.op === "add" || top.op === "subtract")) {
                         this.brace = false;
                     }
-                    if (position == 0 && (((this.op == "multiply" || this.op == "divide") && (top.op == "multiply" || top.op == "divide")) ||
-                        ((this.op == "add" || this.op == "subtract") && (top.op == "add" || top.op == "subtract")))) {
+                    if (position === 0 && (((this.op === "multiply" || this.op === "divide") && (top.op === "multiply" || top.op === "divide")) ||
+                        ((this.op === "add" || this.op === "subtract") && (top.op === "add" || top.op === "subtract")))) {
                         this.brace = false;
                     }
                 }
@@ -104,6 +104,7 @@ function feature2text(input) {
                 args[i] = feature2text(args[i]);
             }
             return new fun(key, args);
+        // no default
     }
 }
 
@@ -114,15 +115,7 @@ module.exports = function(base_path) {
         function (row) {
             return row.Name;
         }
-    ).filter(
-        function (row) {
-            if (row != "" &&
-                row != "Reserved" &&
-                row != "Unassigned" &&
-                !row.startsWith('Assigned'))
-                return true;
-        }
-    ));
+    ).filter((row) => (row !== "" && row !== "Reserved" && row !== "Unassigned" && !row.startsWith('Assigned'))));
     module.own_ies = new Set(csv(fs.readFileSync(path.join(base_path, "own_ies.csv")), { trim: true }).map(
         function (row) {
             return row[0];

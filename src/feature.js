@@ -200,7 +200,7 @@ function peg$parse(input, options) {
       peg$c52 = peg$literalExpectation("true", true),
       peg$c53 = "false",
       peg$c54 = peg$literalExpectation("false", true),
-      peg$c55 = function() { return new parsedFeature(text().toLowerCase() == "true", null, "boolean", location()); },
+      peg$c55 = function() { return new parsedFeature(text().toLowerCase() === "true", null, "boolean", location()); },
       peg$c56 = peg$otherExpectation("whitespace"),
       peg$c57 = /^[ \t\n\r]/,
       peg$c58 = peg$classExpectation([" ", "\t", "\n", "\r"], false, false),
@@ -1325,8 +1325,9 @@ function peg$parse(input, options) {
             return createFakeFeature(base, arg);
           });
           return new parsedFeature(key, args, "operation", base.location, base.name, base.fake);
+        // no default
       }
-      throw "This should never happen";
+      throw new Error("This should never happen");
     }
     function parsedFeature(name, args, type, location, fake, basefake) {
       this.type = type;
@@ -1356,8 +1357,7 @@ function peg$parse(input, options) {
             feature = createFakeFeature(feature, feature_aliases[feature.name]);
         }
         if (feature.args === null) {
-          let warnings = []
-          if(feature.type == "feature") {
+          if(feature.type === "feature") {
             if(feature.name.startsWith('__')) {
               if(!specification.validCustomName(feature.name))
                 specerror.push(new ParseWarning("Illegal custom name '"+feature.name+"'. Must start with a lowercase letter and be camel case.", feature));
@@ -1377,7 +1377,7 @@ function peg$parse(input, options) {
           return [new ParseWarning("Wanted "+want+", but '"+feature.name+"' is "+specification.type(feature)+"."+(hint.length > 0 ? [""].concat(hint).join(" ") : ""), feature)];
         } else {
           let {variants, hints} = specification.arguments(feature, want, specerror, context);
-          if (variants.length == 0) {
+          if (variants.length === 0) {
             variants = specification.arguments(feature).variants;
             return [new ParseWarning("Wanted "+want+", but '"+feature.name+"' is "+variants.map(function(variant) {return variant.ret}).join(" or ")+"."+(hints.length > 0 ? [""].concat(hints).join(" ") : ""), feature)];
           }

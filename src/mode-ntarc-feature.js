@@ -2,7 +2,6 @@ module.exports = function(ace, features, base_path) {
     ace.define('ntarc-feature', [], function (acequire, exports, module) {
 
         var oop = acequire("ace/lib/oop");
-        var config = acequire("ace/config");
         var TextMode = acequire("ace/mode/text").Mode;
         var Range = acequire('ace/range').Range;
         var NTARCHighlightRules = acequire("ntarc_highlight_rules").NTARCHighlightRules;
@@ -16,7 +15,7 @@ module.exports = function(ace, features, base_path) {
                 score: 100000
             })
         }
-        for (var feature of features.own_ies) {
+        for (let feature of features.own_ies) {
             completions.push({
                 caption: feature,
                 snippet: feature,
@@ -24,7 +23,7 @@ module.exports = function(ace, features, base_path) {
                 score: 1000
             })
         }
-        for (var feature of features.iana_ies) {
+        for (let feature of features.iana_ies) {
             completions.push({
                 caption: feature,
                 snippet: feature,
@@ -39,8 +38,6 @@ module.exports = function(ace, features, base_path) {
             this.HighlightRules = NTARCHighlightRules;
             this.createWorker = function (session) {
                 var worker = new WorkerClient(["ace"], require("./worker-ntarc"), "Worker");
-                
-                var markers = new Map();
                 worker.emit("setBasePath", {data: base_path});
 
                 worker.attachToDocument(session.getDocument());
