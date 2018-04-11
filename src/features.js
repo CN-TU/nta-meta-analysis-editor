@@ -22,7 +22,7 @@ const MATH = {
 function ParseWarning(msg, item) {
     this.msg = msg;
     if(item.fake !== undefined) {
-        this.msg = "Expanded from alias '"+item.fake+"': "+this.msg;
+        this.msg = "Expanded from alias '"+item.fake.join("' > '")+"': "+this.msg;
     }
     this.location = item.location;
     this.toString = function () {

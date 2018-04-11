@@ -14,26 +14,26 @@
   function createFakeFeature(base, fake) {
     switch(typeof fake) {
       case "number":
-        return new parsedFeature(fake, null, "number", base.location, base.name);
+        return new parsedFeature(fake, null, "number", base.location, base.name, base.fake);
       case "boolean":
-        return new parsedFeature(fake, null, "boolean", base.location, base.name);
+        return new parsedFeature(fake, null, "boolean", base.location, base.name, base.fake);
       case "string":
-        return new parsedFeature(fake, null, "feature", base.location, base.name);
+        return new parsedFeature(fake, null, "feature", base.location, base.name, base.fake);
       case "object":
         let key = Object.keys(fake)[0];
         let args = fake[key].map(arg => {
           return createFakeFeature(base, arg);
         });
-        return new parsedFeature(key, args, "operation", base.location, base.name);
+        return new parsedFeature(key, args, "operation", base.location, base.name, base.fake);
     }
     throw "This should never happen";
   }
-  function parsedFeature(name, args, type, location, fake) {
+  function parsedFeature(name, args, type, location, fake, basefake) {
     this.type = type;
     this.name = name;
     this.args = args;
     this.location = location;
-    this.fake = fake;
+    this.fake = [].concat(basefake||[], fake||[]);
     this.cleanup = function () {
         switch (this.type) {
             case "operation":
@@ -50,8 +50,11 @@
       let feature = feature_aliases[this.name];
       if (feature === undefined)
         feature = this;
-      else
+      else {
         feature = createFakeFeature(this, feature);
+        while (feature_aliases[feature.name] !== undefined)
+          feature = createFakeFeature(feature, feature_aliases[feature.name]);
+      }
       if (feature.args === null) {
         let warnings = []
         if(feature.type == "feature") {
