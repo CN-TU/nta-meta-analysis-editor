@@ -1,3 +1,5 @@
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.1243058.svg)](https://doi.org/10.5281/zenodo.1243058)
+
 # nta-meta-analysis-editor
 
 Editor for [nta-meta-analysis](https://github.com/CN-TU/nta-meta-analysis) project.
