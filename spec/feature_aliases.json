@@ -42,5 +42,7 @@
 "_KDD38": "_KDD_dstHostSerrorRate",
 "_KDD39": "_KDD_dstHostSrvSerrorRate",
 "_KDD40": "_KDD_dstHostRerrorRate",
-"_KDD41": "_KDD_dstHostSrvRerrorRate"
+"_KDD41": "_KDD_dstHostSrvRerrorRate",
+"_tcpCwrTotalCount": {"count": [{"select": [{"equal": [{"get_bits": [8,"tcpControlBits"]},1]}]}]},
+"_tcpEceTotalCount": {"count": [{"select": [{"equal": [{"get_bits": [9,"tcpControlBits"]},1]}]}]}
 }
