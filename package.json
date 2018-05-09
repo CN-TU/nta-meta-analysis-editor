@@ -1,6 +1,6 @@
 {
   "name": "paper-editor",
-  "version": "3.0.2",
+  "version": "3.0.3",
   "private": true,
   "author": {
     "name": "Gernot Vormayr",
@@ -45,11 +45,11 @@
   },
   "devDependencies": {
     "@heroku/foreman": "github:heroku/node-foreman",
-    "bootstrap": "^4.1.0",
+    "bootstrap": "^4.1.1",
     "brace": "^0.11.1",
-    "csv-parse": "^2.2.0",
-    "electron": "^1.8.4",
-    "electron-builder": "^20.10.0",
+    "csv-parse": "^2.4.0",
+    "electron": "^1.8.6",
+    "electron-builder": "^20.13.3",
     "pegjs": "^0.10.0",
     "react": "^16.3.2",
     "react-dnd": "^2.6.0",
@@ -57,7 +57,7 @@
     "react-dom": "^16.3.2",
     "react-feather": "^1.1.0",
     "react-scripts": "1.1.4",
-    "rjson-editor": "^0.9.15"
+    "rjson-editor": "^0.9.16"
   },
   "scripts": {
     "start": "react-scripts start",
