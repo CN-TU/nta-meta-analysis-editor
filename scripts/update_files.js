@@ -18,7 +18,7 @@ req.on('response', (response) => {
         response.on('end', () => {
             data = JSON.parse(data)
             data = new Map(data.map(tag => {return [tag.name, tag.commit.sha];}));
-            let tags = Array.from(data.keys()).sort();
+            let tags = Array.from(data.keys()).filter(tag => tag[tag.length - 1] != "a").sort();
             let latestTag = tags[tags.length - 1];
             fs.writeFileSync('./spec/commit.json', JSON.stringify({sha:data.get(latestTag), tag:latestTag}));
             download({
