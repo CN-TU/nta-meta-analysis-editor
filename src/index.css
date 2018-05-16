@@ -70,3 +70,9 @@ body {
   border-bottom: 3px solid red;
   position: absolute;
 }
+
+.fileStatus {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+}

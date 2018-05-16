@@ -1,10 +1,12 @@
 import React, { Component } from 'react';
+import Tooltip from 'rc-tooltip';
 import ReactDOM from 'react-dom';
 import './index.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import 'rc-tooltip/assets/bootstrap.css';
 import JSONEditor from 'rjson-editor';
 
-import { File, Save, Copy, Folder, XCircle, CheckCircle, Edit } from 'react-feather';
+import { File, Save, Copy, Folder, XCircle, CheckCircle, Edit, AlertCircle, Circle } from 'react-feather';
 
 const electron = window.require('electron')
 const { remote, ipcRenderer } = electron;
@@ -16,6 +18,7 @@ const { ntarc_filename, ntarc_base_path } = remote.getCurrentWindow();
 
 const features = require('./features.js')(ntarc_base_path);
 const { feature2text, text2feature } = features;
+const Ajv = require('ajv/dist/ajv.min.js');
 
 class FeatureEditor extends Component {
     constructor(props) {
@@ -186,13 +189,55 @@ class NavButton extends Component {
     }
 }
 
+class StatusDisplay extends Component {
+    constructor(props) {
+        super(props);
+
+        this.state = {
+            ok: false,
+            full: false,
+            error: "test",
+        }
+    }
+    render() {
+        if (this.state.full)
+            return (
+                <div className="fileStatus">
+                    <Circle />
+                </div>
+            );
+        if (this.state.ok)
+            return (
+                <div className="fileStatus">
+                    <Tooltip placement="right" overlay={<span>{this.state.error}</span>}><AlertCircle color="yellow" /></Tooltip>
+                </div>
+            );
+        return (
+            <div className="fileStatus">
+                <Tooltip placement="right" overlay={this.state.error}><XCircle color="red" /></Tooltip>
+            </div>
+        );
+    }
+}
+
+
 class MainWindow extends Component {
     constructor(props) {
         super(props);
 
+        var ajv = new Ajv({ schemaId: 'id' });
+        ajv.addFormat("table", () => true);
+        ajv.addFormat("grid", () => true);
+        ajv.addFormat("checkbox", () => true);
+
+        ajv.addMetaSchema(require('ajv/lib/refs/json-schema-draft-04.json'));
+        this.validator = ajv.compile(props.schema);
+        this.fullvalidator = ajv.compile(props.fullschema);
+
         var value = {};
-        if (props.filename !== undefined)
+        if (props.filename !== undefined) {
             value = MainWindow.loadFile(props.filename)
+        }
         this.state = {
             filename: props.filename,
             value: value,
@@ -200,10 +245,12 @@ class MainWindow extends Component {
         this.editor = React.createRef();
         this.saveButton = React.createRef();
         this.editModal = React.createRef();
+        this.statusDisplay = React.createRef();
         this.closeWindow = false;
     }
 
     componentDidMount() {
+        this.doValidate(this.state.value);
         window.onbeforeunload = (e) => {
             if (this.closeWindow) return
             if (this.saveButton.current.state.changed === false) return
@@ -258,6 +305,7 @@ class MainWindow extends Component {
             if (this.state.filename === undefined && this.saveButton.current.state.changed === false) {
                 try {
                     const file = MainWindow.loadFile(files[0]);
+                    this.doValidate(file);
                     this.saveButton.current.setState({ changed: false });
                     this.setState({
                         filename: files[0],
@@ -294,8 +342,41 @@ class MainWindow extends Component {
         }
     }
 
+
+    doValidate = (value) => {
+        if (value === undefined)
+            value = this.editor.current.getValue();
+        const ok = this.validator(value);
+        if (ok) {
+            const full = this.fullvalidator(value);
+            if (full)
+                this.statusDisplay.current.setState({
+                    ok: true,
+                    full: true,
+                    error: ""
+                })
+            else
+                this.statusDisplay.current.setState({
+                    ok: true,
+                    full: false,
+                    error: "Paper" + this.fullvalidator.errors[0].dataPath + " " + this.fullvalidator.errors[0].message
+                })
+        } else {
+            this.statusDisplay.current.setState({
+                ok: false,
+                full: false,
+                error: "Paper" + this.validator.errors[0].dataPath + " " + this.validator.errors[0].message
+            })
+        }
+    }
+
     onEdit = () => {
         this.saveButton.current.setState({ changed: true });
+        clearTimeout(this.validateTimeout);
+        this.validateTimeout = setTimeout(() => {
+            this.validateTimeout = null;
+            this.doValidate();
+        }, 250);
     }
 
     openModal = (path, val) => {
@@ -345,6 +426,7 @@ class MainWindow extends Component {
                     <NavButton icon={Folder} url="#open" text="Open" click={this.fileOpen} />
                     <NavButton icon={Save} url="#save" text="Save" click={this.fileSave} ref={this.saveButton} />
                     <NavButton icon={Copy} url="#saveAs" text="Save as" click={this.fileSaveAs} />
+                    <StatusDisplay ref={this.statusDisplay} />
                 </div>
                 <div className="pt-2 pl-2 main">
                     <JSONEditor
@@ -360,7 +442,24 @@ class MainWindow extends Component {
     }
 }
 
+const schema = fs.readFileSync(path.join(ntarc_base_path, 'schema_v2.json'), 'utf8');
+let fullschema = JSON.parse(schema);
+
+function rewriteRequired(obj) {
+    if (obj.properties !== undefined)
+        obj.required = Object.keys(obj.properties);
+    if (typeof obj === "object")
+        for (let key in obj) {
+            if (key === "bibtex")
+                continue
+            rewriteRequired(obj[key]);
+        }
+}
+
+rewriteRequired(fullschema);
+
 ReactDOM.render(<MainWindow
     filename={ntarc_filename}
-    schema={JSON.parse(fs.readFileSync(path.join(ntarc_base_path, 'schema_v2.json'), 'utf8'))}
+    schema={JSON.parse(schema)}
+    fullschema={fullschema}
 />, document.getElementById('root'));
