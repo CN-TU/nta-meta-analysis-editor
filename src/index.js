@@ -302,7 +302,11 @@ class MainWindow extends Component {
         this.editModal.current.open(path, val);
     }
 
-    onConstruct = (path, cmds) => {
+    onConstruct = (path, cmds, constraints) => {
+        if (constraints.optional === true && constraints.type !== "array")
+            cmds.addPostcontrol("optional", 10000, (
+                <span key="optional" className="badge badge-pill badge-info ml-2">optional</span>
+            ))
         const p = path.split('.');
         if (p[p.length - 1] !== "features")
             return;
@@ -318,6 +322,13 @@ class MainWindow extends Component {
         document.title = "Paper editor - " + (this.state.filename || "new file");
         const defaults = {
             optionalPropertiesTrue: true,
+            optionalPropertiesAlways: (path) => {
+                if (path === "version")
+                    return false;
+                if (path.split('.')[1] === "bibtex")
+                    return false;
+                return true
+            },
             collapsed: (path) => {
                 const p = path.split('.');
                 if (p[p.length - 1] === "features")
