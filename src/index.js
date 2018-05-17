@@ -202,20 +202,27 @@ class StatusDisplay extends Component {
     render() {
         if (this.state.full)
             return (
-                <div className="fileStatus">
-                    <Circle />
+                <div className="fileStatus" style={{color:"green"}} >
+                    <CheckCircle style={{"marginBottom": "-10px"}} /><br />
+                    complete
                 </div>
             );
         if (this.state.ok)
             return (
-                <div className="fileStatus">
-                    <Tooltip placement="right" overlay={<span>{this.state.error}</span>}><AlertCircle color="yellow" /></Tooltip>
-                </div>
+                <Tooltip placement="right" overlay={<span>{this.state.error}</span>}>
+                    <div className="fileStatus" style={{color:"yellow"}} >
+                        <AlertCircle style={{"marginBottom": "-10px"}} /><br />
+                        basic
+                    </div>
+                </Tooltip>
             );
         return (
-            <div className="fileStatus">
-                <Tooltip placement="right" overlay={this.state.error}><XCircle color="red" /></Tooltip>
-            </div>
+            <Tooltip placement="right" overlay={this.state.error}>
+                <div className="fileStatus" style={{color:"red"}} >
+                    <XCircle style={{"marginBottom": "-10px"}} /><br />
+                    error
+                </div>
+            </Tooltip>
         );
     }
 }
