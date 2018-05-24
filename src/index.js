@@ -6,7 +6,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'rc-tooltip/assets/bootstrap.css';
 import JSONEditor from 'rjson-editor';
 
-import { File, Save, Copy, Folder, XCircle, CheckCircle, Edit, AlertCircle, Circle } from 'react-feather';
+import { File, Save, Copy, Folder, XCircle, CheckCircle, Edit, AlertCircle } from 'react-feather';
 
 const electron = window.require('electron')
 const { remote, ipcRenderer } = electron;
