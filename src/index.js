@@ -209,7 +209,7 @@ class StatusDisplay extends Component {
             );
         if (this.state.ok)
             return (
-                <Tooltip placement="right" overlay={<span>{this.state.error}</span>}>
+                <Tooltip placement="right" overlay={<span>Basic NTARC. Error for complete: {this.state.error}</span>}>
                     <div className="fileStatus" style={{color:"yellow"}} >
                         <AlertCircle style={{"marginBottom": "-10px"}} /><br />
                         basic
