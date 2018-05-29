@@ -1,6 +1,6 @@
 {
   "name": "paper-editor",
-  "version": "3.1.1",
+  "version": "3.1.2",
   "private": true,
   "author": {
     "name": "Gernot Vormayr",
@@ -51,7 +51,7 @@
     "brace": "^0.11.1",
     "csv-parse": "^2.4.0",
     "electron": "^1.8.7",
-    "electron-builder": "^20.14.7",
+    "electron-builder": "^20.15.1",
     "pegjs": "^0.10.0",
     "react": "^16.4.0",
     "react-dnd": "^2.6.0",
@@ -59,7 +59,7 @@
     "react-dom": "^16.4.0",
     "react-feather": "^1.1.0",
     "react-scripts": "1.1.4",
-    "rjson-editor": "^0.10.3"
+    "rjson-editor": "^0.10.4"
   },
   "scripts": {
     "start": "react-scripts start",
