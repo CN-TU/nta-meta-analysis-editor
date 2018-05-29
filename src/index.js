@@ -202,10 +202,12 @@ class StatusDisplay extends Component {
     render() {
         if (this.state.full)
             return (
-                <div className="fileStatus" style={{color:"green"}} >
-                    <CheckCircle style={{"marginBottom": "-10px"}} /><br />
-                    complete
-                </div>
+                <Tooltip placement="right" overlay={<span>File sucessfully verified by schema.</span>}>
+                    <div className="fileStatus" style={{color:"green"}} >
+                        <CheckCircle style={{"marginBottom": "-10px"}} /><br />
+                        ok
+                    </div>
+                </Tooltip>
             );
         if (this.state.ok)
             return (
@@ -396,14 +398,23 @@ class MainWindow extends Component {
                 <span key="optional" className="badge badge-pill badge-info ml-2">optional</span>
             ))
         const p = path.split('.');
-        if (p[p.length - 1] !== "features")
+        if (p[p.length - 1] !== "features" && p[p.length - 1] !== "key_features")
             return;
-        cmds.addPostcontrol("EditFeature", -2000, (
-            <button type="button"
-                key="editFeature"
-                className="btn btn-sm btn-outline-primary ml-2"
-                onClick={this.openModal.bind(this, path, cmds)}><Edit /> Features</button>
+        if (constraints.type === "array")
+            cmds.addPostcontrol("EditFeature", -2000, (
+                <button type="button"
+                    key="editFeature"
+                    className="btn btn-sm btn-outline-primary ml-2"
+                    onClick={this.openModal.bind(this, path, cmds)}><Edit /> Features</button>
         ))
+    }
+
+    onDestruct = (path, cmds, constraints) => {
+        const p = path.split('.');
+        if (p[p.length - 1] !== "features" && p[p.length - 1] !== "key_features")
+            return;
+        if (constraints.type === "array")
+            cmds.delPostcontrol("EditFeature");
     }
 
     render() {
@@ -441,7 +452,7 @@ class MainWindow extends Component {
                         value={this.state.value}
                         ref={this.editor}
                         defaults={defaults}
-                        onEdit={this.onEdit} onConstruct={this.onConstruct} />
+                        onEdit={this.onEdit} onConstruct={this.onConstruct} onDestruct={this.onDestruct} />
                 </div>
                 <FeatureEditor ref={this.editModal} />
             </React.Fragment>
