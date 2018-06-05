@@ -31,21 +31,39 @@
       "pattern": "^((_KDD){0,1}_[A-Za-z0-9_][A-Za-z0-9]+|((?!_).)*)$"
     },
     "key": {
-      "type": "array",
       "title": "key_features <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/features.html\">help</a>",
-      "items": {
-        "$ref": "#/definitions/feature"
-      }
+      "oneOf": [
+        {
+          "title": "key_features",
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/definitions/feature"
+          }
+        },
+        {
+          "$ref": "#/definitions/missing"
+        },
+        {
+          "$ref": "#/definitions/none"
+        }
+      ]
     },
     "features": {
       "title": "features <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/features.html\">help</a>",
-      "type": [
-        "array",
-        "null"
-      ],
-      "items": {
-        "$ref": "#/definitions/feature"
-      }
+      "oneOf": [
+        {
+          "title": "features",
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/definitions/feature"
+          }
+        },
+        {
+          "$ref": "#/definitions/missing"
+        }
+      ]
     },
     "tool": {
       "title": "tool",
@@ -59,8 +77,16 @@
         },
         "detail": {
           "title": "detail <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/preprocessing.html#detail-optional\">help</a>",
-          "type": "string",
-          "minLength": 1
+          "anyOf": [
+            {
+              "title": "detail",
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "$ref": "#/definitions/none"
+            }
+          ]
         },
         "availability": {
           "title": "availability <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/preprocessing.html#availability\">help</a>",
@@ -88,6 +114,25 @@
       "required": [
         "name",
         "availability"
+      ]
+    },
+    "tools": {
+      "title": "tools <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/preprocessing.html#tools\">help</a>",
+      "propertyOrder": 50,
+      "oneOf": [
+        {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/definitions/tool"
+          }
+        },
+        {
+          "$ref": "#/definitions/missing"
+        },
+        {
+          "$ref": "#/definitions/none"
+        }
       ]
     },
     "selection": {
@@ -166,23 +211,26 @@
       ]
     },
     "time": {
-      "type": [
-        "number",
-        "string"
-      ],
+      "type": "number",
+      "title": "time"
+    },
+    "time_times": {
       "oneOf": [
         {
-          "type": "string",
-          "minLength": 1,
-          "enum": [
-            "missing"
-          ]
+          "$ref": "#/definitions/time"
         },
         {
-          "type": "number"
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/time"
+          },
+          "minItems": 1,
+          "title": "times"
+        },
+        {
+          "$ref": "#/definitions/missing"
         }
-      ],
-      "title": "time"
+      ]
     },
     "other": {
       "type": "string",
@@ -197,6 +245,13 @@
       "enum": [
         "missing"
       ]
+    },
+    "none": {
+      "title": "none",
+      "type": "string",
+      "enum": [
+        "none"
+      ]
     }
   },
   "properties": {
@@ -204,8 +259,8 @@
       "title": "version",
       "type": "string",
       "propertyOrder": 1,
-      "default": "v2.1.1",
-      "enum": ["v2.1.1", "v2.1"]
+      "default": "v2.2.0",
+      "enum": ["v2.2.0", "v2.1.1", "v2.1"]
     },
     "reference": {
       "title": "reference",
@@ -372,217 +427,256 @@
     },
     "data": {
       "title": "data",
-      "type": "object",
       "propertyOrder": 20,
+      "type": "object",
       "properties": {
         "datasets": {
-          "type": "array",
-          "title": "datasets",
-          "items": {
-            "title": "dataset",
-            "type": "object",
-            "properties": {
-              "name": {
-                "title": "name <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/data.html#name\">help</a>",
-                "type": "string",
-                "propertyOrder": 10,
-                "minLength": 1
-              },
-              "availability": {
-                "title": "availability <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/data.html#availability\">help</a>",
-                "type": "string",
-                "minLength": 1,
-                "propertyOrder": 20,
-                "oneOf": [
-                  {
-                    "enum": [
-                      "public",
-                      "public_on_demand",
-                      "private",
-                      "lost_source"
-                    ],
-                    "title": "default values"
+          "oneOf": [
+            {
+              "type": "array",
+              "minItems": 1,
+              "title": "datasets",
+              "items": {
+                "title": "dataset",
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "title": "name <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/data.html#name\">help</a>",
+                    "type": "string",
+                    "propertyOrder": 10,
+                    "minLength": 1
                   },
-                  {
-                    "$ref": "#/definitions/other"
-                  },
-                  {
-                    "$ref": "#/definitions/missing"
-                  }
-                ]
-              },
-              "format": {
-                "title": "format <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/data.html#format-optional\">help</a>",
-                "type": "string",
-                "propertyOrder": 30,
-                "minLength": 1,
-                "oneOf": [
-                  {
-                    "title": "default values",
-                    "enum": [
-                      "packet",
-                      "flow"
+                  "availability": {
+                    "title": "availability <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/data.html#availability\">help</a>",
+                    "type": "string",
+                    "minLength": 1,
+                    "propertyOrder": 20,
+                    "oneOf": [
+                      {
+                        "enum": [
+                          "public",
+                          "public_on_demand",
+                          "private",
+                          "lost_source"
+                        ],
+                        "title": "default values"
+                      },
+                      {
+                        "$ref": "#/definitions/other"
+                      },
+                      {
+                        "$ref": "#/definitions/missing"
+                      }
                     ]
                   },
-                  {
-                    "$ref": "#/definitions/other"
-                  },
-                  {
-                    "$ref": "#/definitions/missing"
-                  }
-                ]
-              },
-              "types": {
-                "title": "types <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/data.html#types-optional\">help</a>",
-                "type": "array",
-                "format": "table",
-                "propertyOrder": 40,
-                "items": {
-                  "title": "type",
-                  "type": "string",
-                  "oneOf": [
-                    {
-                      "enum": [
-                        "ip",
-                        "ipv4",
-                        "ipv6",
-                        "tcp",
-                        "http",
-                        "udp",
-                        "icmp",
-                        "dns",
-                        "tls",
-                        "ipsec"
-                      ],
-                      "title": "default values"
-                    },
-                    {
-                      "$ref": "#/definitions/other"
-                    },
-                    {
-                      "$ref": "#/definitions/missing"
-                    }
-                  ]
-                }
-              },
-              "generation": {
-                "title": "generation <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/data.html#generation-optional\">help</a>",
-                "type": "string",
-                "propertyOrder": 50,
-                "minLength": 1,
-                "oneOf": [
-                  {
-                    "title": "default values",
-                    "enum": [
-                      "captured",
-                      "synthetic",
-                      "altered_captured",
-                      "mixed"
+                  "format": {
+                    "title": "format <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/data.html#format-optional\">help</a>",
+                    "type": "string",
+                    "propertyOrder": 30,
+                    "minLength": 1,
+                    "oneOf": [
+                      {
+                        "title": "default values",
+                        "enum": [
+                          "packet",
+                          "flow"
+                        ]
+                      },
+                      {
+                        "$ref": "#/definitions/other"
+                      },
+                      {
+                        "$ref": "#/definitions/missing"
+                      }
                     ]
                   },
-                  {
-                    "$ref": "#/definitions/other"
-                  },
-                  {
-                    "$ref": "#/definitions/missing"
-                  }
-                ]
-              },
-              "generation_year": {
-                "title": "generation_year <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/data.html#generation-year\">help</a>",
-                "propertyOrder": 60,
-                "oneOf": [
-                  {
-                    "title": "year",
-                    "type": "integer",
-                    "minimum": 1900
-                  },
-                  {
-                    "title": "years",
+                  "types": {
+                    "title": "types <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/data.html#types-optional\">help</a>",
                     "type": "array",
+                    "minItems": 1,
+                    "format": "table",
+                    "propertyOrder": 40,
                     "items": {
-                      "type": "integer",
-                      "title": "year",
-                      "minimum": 1900
+                      "title": "type",
+                      "type": "string",
+                      "oneOf": [
+                        {
+                          "enum": [
+                            "ip",
+                            "ipv4",
+                            "ipv6",
+                            "tcp",
+                            "http",
+                            "udp",
+                            "icmp",
+                            "dns",
+                            "tls",
+                            "ipsec"
+                          ],
+                          "title": "default values"
+                        },
+                        {
+                          "$ref": "#/definitions/other"
+                        },
+                        {
+                          "$ref": "#/definitions/missing"
+                        }
+                      ]
                     }
                   },
-                  {
-                    "$ref": "#/definitions/missing"
-                  }
-                ]
-              },
-              "covered_period": {
-                "title": "covered_period <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/data.html#covered-period-optional\">help</a>",
-                "type": "string",
-                "propertyOrder": 70,
-                "minLength": 1,
-                "oneOf": [
-                  {
-                    "title": "default values",
-                    "enum": [
-                      "minutes",
-                      "hours",
-                      "days",
-                      "weeks",
-                      "months",
-                      "years"
+                  "generation": {
+                    "title": "generation <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/data.html#generation-optional\">help</a>",
+                    "type": "string",
+                    "propertyOrder": 50,
+                    "minLength": 1,
+                    "oneOf": [
+                      {
+                        "title": "default values",
+                        "enum": [
+                          "captured",
+                          "synthetic",
+                          "altered_captured",
+                          "mixed"
+                        ]
+                      },
+                      {
+                        "$ref": "#/definitions/other"
+                      },
+                      {
+                        "$ref": "#/definitions/missing"
+                      }
                     ]
                   },
-                  {
-                    "$ref": "#/definitions/other"
+                  "generation_year": {
+                    "title": "generation_year <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/data.html#generation-year\">help</a>",
+                    "propertyOrder": 60,
+                    "oneOf": [
+                      {
+                        "title": "year",
+                        "type": "integer",
+                        "minimum": 1900
+                      },
+                      {
+                        "title": "years",
+                        "type": "array",
+                        "minItems": 1,
+                        "items": {
+                          "type": "integer",
+                          "title": "year",
+                          "minimum": 1900
+                        }
+                      },
+                      {
+                        "$ref": "#/definitions/missing"
+                      }
+                    ]
                   },
-                  {
-                    "$ref": "#/definitions/missing"
+                  "covered_period": {
+                    "title": "covered_period <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/data.html#covered-period-optional\">help</a>",
+                    "type": "string",
+                    "propertyOrder": 70,
+                    "minLength": 1,
+                    "oneOf": [
+                      {
+                        "title": "default values",
+                        "enum": [
+                          "minutes",
+                          "hours",
+                          "days",
+                          "weeks",
+                          "months",
+                          "years"
+                        ]
+                      },
+                      {
+                        "$ref": "#/definitions/other"
+                      },
+                      {
+                        "$ref": "#/definitions/missing"
+                      }
+                    ]
+                  },
+                  "details": {
+                    "title": "details <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/data.html#details-optional\">help</a>",
+                    "propertyOrder": 80,
+                    "oneOf": [
+                      {
+                        "format": "table",
+                        "type": "array",
+                        "minItems": 1,
+                        "items": {
+                          "title": "detail",
+                          "type": "string",
+                          "minLength": 1,
+                          "oneOf": [
+                            {
+                              "title": "default values",
+                              "enum": [
+                                "raw",
+                                "preprocessed",
+                                "no_payload"
+                              ]
+                            },
+                            {
+                              "$ref": "#/definitions/other"
+                            }
+                          ]
+                        }
+                      },
+                      {
+                        "$ref": "#/definitions/none"
+                      }
+                    ]
+                  },
+                  "subsets": {
+                    "title": "subsets <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/data.html#subsets\">help</a>",
+                    "propertyOrder": 90,
+                    "oneOf": [
+                      {
+                        "type": "array",
+                        "minItems": 1,
+                        "format": "table",
+                        "items": {
+                          "title": "subset",
+                          "type": "string",
+                          "minLength": 1
+                        }
+                      },
+                      {
+                        "$ref": "#/definitions/missing"
+                      },
+                      {
+                        "$ref": "#/definitions/none"
+                      }
+                    ]
+                  },
+                  "anonymized": {
+                    "title": "anonymized <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/data.html#anonymized-optional\">help</a>",
+                    "oneOf": [
+                      {
+                        "type": "boolean"
+                      },
+                      {
+                        "$ref": "#/definitions/missing"
+                      }
+                    ],
+                    "propertyOrder": 100
                   }
+                },
+                "required": [
+                  "name",
+                  "generation_year",
+                  "subsets"
                 ]
-              },
-              "details": {
-                "title": "details <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/data.html#details-optional\">help</a>",
-                "propertyOrder": 80,
-                "format": "table",
-                "type": "array",
-                "items": {
-                  "title": "detail",
-                  "type": "string",
-                  "minLength": 1,
-                  "oneOf": [
-                    {
-                      "title": "default values",
-                      "enum": [
-                        "raw",
-                        "preprocessed",
-                        "no_payload"
-                      ]
-                    },
-                    {
-                      "$ref": "#/definitions/other"
-                    }
-                  ]
-                }
-              },
-              "subsets": {
-                "title": "subsets <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/data.html#subsets\">help</a>",
-                "type": "array",
-                "format": "table",
-                "propertyOrder": 90,
-                "items": {
-                  "title": "subset",
-                  "type": "string",
-                  "minLength": 1
-                }
-              },
-              "anonymized": {
-                "title": "anonymized <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/data.html#anonymized-optional\">help</a>",
-                "type": "boolean",
-                "propertyOrder": 100
               }
             },
-            "required": [
-              "name",
-              "generation_year",
-              "subsets"
-            ]
-          }
+            {
+              "$ref": "#/definitions/missing"
+            },
+            {
+              "$ref": "#/definitions/none"
+            }
+          ]
         }
       }
     },
@@ -616,12 +710,8 @@
           "type": "boolean"
         },
         "tools": {
-          "title": "tools <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/preprocessing.html#tools\">help</a>",
-          "type": "array",
           "propertyOrder": 50,
-          "items": {
-            "$ref": "#/definitions/tool"
-          }
+          "$ref": "#/definitions/tools"
         },
         "normalization_type": {
           "title": "normalization_type <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/preprocessing.html#normalization-type\">help</a>",
@@ -650,39 +740,46 @@
         },
         "transformations": {
           "title": "transformations <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/preprocessing.html#transformations\">help</a>",
-          "type": "array",
-          "format": "table",
           "propertyOrder": 70,
-          "items": {
-            "title": "transformation",
-            "type": "string",
-            "minLength": 1,
-            "oneOf": [
-              {
-                "title": "default values",
-                "enum": [
-                  "no",
-                  "sampling",
-                  "filtering",
-                  "log",
-                  "map",
-                  "graph",
-                  "feature_aggregation",
-                  "flow_extraction",
-                  "entropy",
-                  "time_series",
-                  "feature_operation",
-                  "class_separation"
+          "oneOf": [
+            {
+              "type": "array",
+              "minItems": 1,
+              "format": "table",
+              "items": {
+                "title": "transformation",
+                "type": "string",
+                "minLength": 1,
+                "oneOf": [
+                  {
+                    "title": "default values",
+                    "enum": [
+                      "sampling",
+                      "filtering",
+                      "log",
+                      "map",
+                      "graph",
+                      "feature_aggregation",
+                      "flow_extraction",
+                      "entropy",
+                      "time_series",
+                      "feature_operation",
+                      "class_separation"
+                    ]
+                  },
+                  {
+                    "$ref": "#/definitions/other"
+                  }
                 ]
-              },
-              {
-                "$ref": "#/definitions/other"
-              },
-              {
-                "$ref": "#/definitions/missing"
               }
-            ]
-          }
+            },
+            {
+              "$ref": "#/definitions/missing"
+            },
+            {
+              "$ref": "#/definitions/none"
+            }
+          ]
         },
         "final_data_format": {
           "title": "final_data_format <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/preprocessing.html#final-data-format\">help</a>",
@@ -710,208 +807,214 @@
         },
         "feature_selections": {
           "title": "feature_selections",
-          "type": "array",
           "propertyOrder": 90,
-          "items": {
-            "title": "feature_selection",
-            "type": "object",
-            "format": "grid",
-            "properties": {
-              "name": {
-                "title": "name <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/preprocessing.html#id2\">help</a>",
-                "type": "string",
-                "propertyOrder": 10,
-                "minLength": 1
-              },
-              "type": {
-                "title": "type <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/preprocessing.html#type-optional\">help</a>",
-                "type": "string",
-                "propertyOrder": 20,
-                "minLength": 1,
-                "oneOf": [
-                  {
-                    "title": "default values",
-                    "enum": [
-                      "wrapper",
-                      "filter",
-                      "hybrid",
-                      "nest",
-                      "feature_reduction"
+          "oneOf": [
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "title": "feature_selection",
+                "type": "object",
+                "format": "grid",
+                "properties": {
+                  "name": {
+                    "title": "name <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/preprocessing.html#id2\">help</a>",
+                    "type": "string",
+                    "propertyOrder": 10,
+                    "minLength": 1
+                  },
+                  "type": {
+                    "title": "type <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/preprocessing.html#type-optional\">help</a>",
+                    "type": "string",
+                    "propertyOrder": 20,
+                    "minLength": 1,
+                    "oneOf": [
+                      {
+                        "title": "default values",
+                        "enum": [
+                          "wrapper",
+                          "filter",
+                          "hybrid",
+                          "nest",
+                          "feature_reduction"
+                        ]
+                      },
+                      {
+                        "$ref": "#/definitions/other"
+                      },
+                      {
+                        "$ref": "#/definitions/missing"
+                      }
                     ]
                   },
-                  {
-                    "$ref": "#/definitions/other"
+                  "classifier": {
+                    "title": "classifier <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/preprocessing.html#classifier-optional\">help</a>",
+                    "propertyOrder": 30,
+                    "anyOf": [
+                        {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        {
+                          "$ref": "#/definitions/none"
+                        }
+                    ]
                   },
-                  {
-                    "$ref": "#/definitions/missing"
+                  "role": {
+                    "propertyOrder": 40,
+                    "$ref": "#/definitions/role"
                   }
+                },
+                "required": [
+                  "name"
                 ]
-              },
-              "classifier": {
-                "title": "classifier <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/preprocessing.html#classifier-optional\">help</a>",
-                "type": "string",
-                "propertyOrder": 30,
-                "minLength": 1
-              },
-              "role": {
-                "propertyOrder": 40,
-                "$ref": "#/definitions/role"
               }
             },
-            "required": [
-              "name"
-            ]
-          }
+            {
+              "$ref": "#/definitions/none"
+            }
+          ]
         },
         "packets": {
           "title": "packets",
-          "type": "array",
           "propertyOrder": 100,
-          "items": {
-            "title": "packet",
-            "type": "object",
-            "properties": {
-              "selection": {
-                "propertyOrder": 10,
-                "$ref": "#/definitions/selection"
-              },
-              "role": {
-                "propertyOrder": 20,
-                "$ref": "#/definitions/role"
-              },
-              "main_goal": {
-                "propertyOrder": 30,
-      "title": "main_goal <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/preprocessing.html#main-goal-optional\">help</a>",
-                "$ref": "#/definitions/goal"
-              },
-              "features": {
-                "propertyOrder": 40,
-                "$ref": "#/definitions/features"
+          "oneOf": [
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "title": "packet",
+                "type": "object",
+                "properties": {
+                  "selection": {
+                    "propertyOrder": 10,
+                    "$ref": "#/definitions/selection"
+                  },
+                  "role": {
+                    "propertyOrder": 20,
+                    "$ref": "#/definitions/role"
+                  },
+                  "main_goal": {
+                    "propertyOrder": 30,
+                    "title": "main_goal <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/preprocessing.html#main-goal-optional\">help</a>",
+                    "$ref": "#/definitions/goal"
+                  },
+                  "features": {
+                    "propertyOrder": 40,
+                    "$ref": "#/definitions/features"
+                  }
+                }
               }
+            },
+            {
+              "$ref": "#/definitions/none"
             }
-          }
+          ]
         },
         "flows": {
           "title": "flows",
-          "type": "array",
           "propertyOrder": 110,
-          "items": {
-            "title": "flow",
-            "type": "object",
-            "properties": {
-              "selection": {
-                "propertyOrder": 10,
-                "$ref": "#/definitions/selection"
-              },
-              "role": {
-                "propertyOrder": 20,
-                "$ref": "#/definitions/role"
-              },
-              "main_goal": {
-                "propertyOrder": 30,
-      "title": "main_goal <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/preprocessing.html#main-goal-optional\">help</a>",
-                "$ref": "#/definitions/goal"
-              },
-              "active_timeout": {
-                "propertyOrder": 40,
-                "title": "active_timeout <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/preprocessing.html#active-timeout-optional\">help</a>",
-                "oneOf": [
-                  {
-                    "$ref": "#/definitions/time"
+          "oneOf": [
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "title": "flow",
+                "type": "object",
+                "properties": {
+                  "selection": {
+                    "propertyOrder": 10,
+                    "$ref": "#/definitions/selection"
                   },
-                  {
-                    "type": "array",
-                    "items": {
-                      "$ref": "#/definitions/time"
-                    },
-                    "title": "times"
-                  }
-                ]
-              },
-              "idle_timeout": {
-                "title": "idle_timeout <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/preprocessing.html#idle-timeout-optional\">help</a>",
-                "propertyOrder": 50,
-                "oneOf": [
-                  {
-                    "$ref": "#/definitions/time"
+                  "role": {
+                    "propertyOrder": 20,
+                    "$ref": "#/definitions/role"
                   },
-                  {
-                    "type": "array",
-                    "items": {
-                      "$ref": "#/definitions/time"
-                    },
-                    "title": "times"
+                  "main_goal": {
+                    "propertyOrder": 30,
+                    "title": "main_goal <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/preprocessing.html#main-goal-optional\">help</a>",
+                    "$ref": "#/definitions/goal"
+                  },
+                  "active_timeout": {
+                    "propertyOrder": 40,
+                    "title": "active_timeout <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/preprocessing.html#active-timeout-optional\">help</a>",
+                    "$ref": "#/definitions/time_times"
+                  },
+                  "idle_timeout": {
+                    "title": "idle_timeout <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/preprocessing.html#idle-timeout-optional\">help</a>",
+                    "propertyOrder": 50,
+                    "$ref": "#/definitions/time_times"
+                  },
+                  "bidirectional": {
+                    "propertyOrder": 60,
+                    "title": "bidirectional <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/preprocessing.html#bidirectional-optional\">help</a>",
+                    "type": "boolean"
+                  },
+                  "features": {
+                    "propertyOrder": 70,
+                    "$ref": "#/definitions/features"
+                  },
+                  "key_features": {
+                    "propertyOrder": 80,
+                    "$ref": "#/definitions/key"
                   }
-                ]
-              },
-              "bidirectional": {
-                "propertyOrder": 60,
-                "title": "bidirectional <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/preprocessing.html#bidirectional-optional\">help</a>",
-                "type": "boolean"
-              },
-              "features": {
-                "propertyOrder": 70,
-                "$ref": "#/definitions/features"
-              },
-              "key_features": {
-                "propertyOrder": 80,
-                "$ref": "#/definitions/key"
+                }
               }
+            },
+            {
+              "$ref": "#/definitions/none"
             }
-          }
+          ]
         },
         "flow_aggregations": {
           "title": "flow_aggregations",
-          "type": "array",
           "propertyOrder": 120,
-          "items": {
-            "title": "flow_aggregation",
-            "type": "object",
-            "properties": {
-              "selection": {
-                "propertyOrder": 10,
-                "$ref": "#/definitions/selection"
-              },
-              "role": {
-                "propertyOrder": 20,
-                "$ref": "#/definitions/role"
-              },
-              "main_goal": {
-                "propertyOrder": 30,
-      "title": "main_goal <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/preprocessing.html#main-goal-optional\">help</a>",
-                "$ref": "#/definitions/goal"
-              },
-              "bidirectional": {
-                "propertyOrder": 35,
-                "title": "bidirectional <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/preprocessing.html#bidirectional-optional\">help</a>",
-                "type": "boolean"
-              },
-              "active_timeout": {
-                "propertyOrder": 40,
-                "title": "active_timeout <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/preprocessing.html#active-timeout-optional\">help</a>",
-                "oneOf": [
-                  {
-                    "$ref": "#/definitions/time"
+          "oneOf": [
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "title": "flow_aggregation",
+                "type": "object",
+                "properties": {
+                  "selection": {
+                    "propertyOrder": 10,
+                    "$ref": "#/definitions/selection"
                   },
-                  {
-                    "type": "array",
-                    "items": {
-                      "$ref": "#/definitions/time"
-                    },
-                    "title": "times"
+                  "role": {
+                    "propertyOrder": 20,
+                    "$ref": "#/definitions/role"
+                  },
+                  "main_goal": {
+                    "propertyOrder": 30,
+                    "title": "main_goal <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/preprocessing.html#main-goal-optional\">help</a>",
+                    "$ref": "#/definitions/goal"
+                  },
+                  "bidirectional": {
+                    "propertyOrder": 35,
+                    "title": "bidirectional <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/preprocessing.html#bidirectional-optional\">help</a>",
+                    "type": "boolean"
+                  },
+                  "active_timeout": {
+                    "propertyOrder": 40,
+                    "title": "active_timeout <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/preprocessing.html#active-timeout-optional\">help</a>",
+                    "$ref": "#/definitions/time_times"
+                  },
+                  "features": {
+                    "propertyOrder": 50,
+                    "$ref": "#/definitions/features"
+                  },
+                  "key_features": {
+                    "propertyOrder": 60,
+                    "$ref": "#/definitions/key"
                   }
-                ]
-              },
-              "features": {
-                "propertyOrder": 50,
-                "$ref": "#/definitions/features"
-              },
-              "key_features": {
-                "propertyOrder": 60,
-                "$ref": "#/definitions/key"
+                }
               }
+            },
+            {
+              "$ref": "#/definitions/none"
             }
-          }
+          ]
         }
       },
       "required": [
@@ -955,171 +1058,182 @@
           "type": "boolean"
         },
         "tools": {
-          "title": "tools",
-          "type": "array",
           "propertyOrder": 50,
-          "items": {
-            "$ref": "#/definitions/tool"
-          }
+          "$ref": "#/definitions/tools"
         },
         "algorithms": {
           "title": "algorithms",
-          "type": "array",
           "propertyOrder": 60,
-          "items": {
-            "title": "algorithm",
-            "type": "object",
-            "properties": {
-              "name": {
-                "title": "name <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/analysis_method.html#id2\">help</a>",
-                "type": "string",
-                "propertyOrder": 10,
-                "minLength": 1
-              },
-              "subname": {
-                "title": "subname <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/analysis_method.html#subname-optional\">help</a>",
-                "type": "string",
-                "propertyOrder": 20,
-                "minLength": 1
-              },
-              "learning": {
-                "title": "learning <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/analysis_method.html#learning-optional\">help</a>",
-                "type": "string",
-                "propertyOrder": 30,
-                "minLength": 1,
-                "oneOf": [
-                  {
-                    "title": "default values",
-                    "enum": [
-                      "supervised",
-                      "unsupervised",
-                      "semisupervised",
-                      "statistics/model_fit",
-                      "nest",
-                      "no"
-                    ]
-                  },
-                  {
-                    "$ref": "#/definitions/other"
-                  },
-                  {
-                    "$ref": "#/definitions/missing"
-                  }
-                ]
-              },
-              "role": {
-                "propertyOrder": 40,
-                "$ref": "#/definitions/role"
-              },
-              "type": {
-                "title": "type <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/analysis_method.html#type-optional\">help</a>",
-                "type": "string",
-                "propertyOrder": 50,
-                "minLength": 1,
-                "oneOf": [
-                  {
-                    "title": "default values",
-                    "enum": [
-                      "classification",
-                      "regression",
-                      "clustering",
-                      "heuristics",
-                      "anomaly_detection",
-                      "statistics",
-                      "text_matching"
-                    ]
-                  },
-                  {
-                    "$ref": "#/definitions/other"
-                  },
-                  {
-                    "$ref": "#/definitions/missing"
-                  }
-                ]
-              },
-              "metric/decision_criteria": {
-                "title": "metric/decision_criteria <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/analysis_method.html#metric-decision-criteria-optional\">help</a>",
-                "type": "string",
-                "minLength": 1,
-                "propertyOrder": 60,
-                "oneOf": [
-                  {
-                    "title": "default values",
-                    "enum": [
-                      "error/fitting_function",
-                      "euclidean",
-                      "mutual_information",
-                      "correlation",
-                      "jaccard",
-                      "mahalanobis",
-                      "hamming",
-                      "exact_matching",
-                      "manhattan",
-                      "probabilistic",
-                      "vote",
-                      "no"
-                    ]
-                  },
-                  {
-                    "$ref": "#/definitions/other"
-                  },
-                  {
-                    "$ref": "#/definitions/missing"
-                  }
-                ]
-              },
-              "tools": {
-                "title": "tools",
-                "type": "array",
-                "propertyOrder": 70,
-                "items": {
-                  "$ref": "#/definitions/tool"
-                }
-              },
-              "source": {
-                "title": "source <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/analysis_method.html#source-optional\">help</a>",
-                "type": "string",
-                "minLength": 1,
-                "propertyOrder": 80,
-                "oneOf": [
-                  {
-                    "title": "default values",
-                    "enum": [
-                      "own_proposed",
-                      "own_referenced",
-                      "referenced"
-                    ]
-                  },
-                  {
-                    "$ref": "#/definitions/other"
-                  },
-                  {
-                    "$ref": "#/definitions/missing"
-                  }
-                ]
-              },
-              "parameters_provided": {
-                "title": "parameters_provided <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/analysis_method.html#parameters-provided-optional\">help</a>",
-                "propertyOrder": 90,
-                "oneOf": [
-                  {
-                    "title": "boolean",
-                    "type": "boolean"
-                  },
-                  {
-                    "title": "partially",
+          "oneOf": [
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "title": "algorithm",
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "title": "name <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/analysis_method.html#id2\">help</a>",
                     "type": "string",
-                    "enum": [
-                      "partially"
+                    "propertyOrder": 10,
+                    "minLength": 1
+                  },
+                  "subname": {
+                    "title": "subname <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/analysis_method.html#subname-optional\">help</a>",
+                    "propertyOrder": 20,
+                    "anyOf": [
+                      {
+                        "title": "subname",
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      {
+                        "$ref": "#/definitions/none"
+                      }
+                    ]
+                  },
+                  "learning": {
+                    "title": "learning <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/analysis_method.html#learning-optional\">help</a>",
+                    "type": "string",
+                    "propertyOrder": 30,
+                    "minLength": 1,
+                    "oneOf": [
+                      {
+                        "title": "default values",
+                        "enum": [
+                          "supervised",
+                          "unsupervised",
+                          "semisupervised",
+                          "statistics/model_fit",
+                          "nest",
+                          "no"
+                        ]
+                      },
+                      {
+                        "$ref": "#/definitions/other"
+                      },
+                      {
+                        "$ref": "#/definitions/missing"
+                      }
+                    ]
+                  },
+                  "role": {
+                    "propertyOrder": 40,
+                    "$ref": "#/definitions/role"
+                  },
+                  "type": {
+                    "title": "type <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/analysis_method.html#type-optional\">help</a>",
+                    "type": "string",
+                    "propertyOrder": 50,
+                    "minLength": 1,
+                    "oneOf": [
+                      {
+                        "title": "default values",
+                        "enum": [
+                          "classification",
+                          "regression",
+                          "clustering",
+                          "heuristics",
+                          "anomaly_detection",
+                          "statistics",
+                          "text_matching"
+                        ]
+                      },
+                      {
+                        "$ref": "#/definitions/other"
+                      },
+                      {
+                        "$ref": "#/definitions/missing"
+                      }
+                    ]
+                  },
+                  "metric/decision_criteria": {
+                    "title": "metric/decision_criteria <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/analysis_method.html#metric-decision-criteria-optional\">help</a>",
+                    "type": "string",
+                    "minLength": 1,
+                    "propertyOrder": 60,
+                    "oneOf": [
+                      {
+                        "title": "default values",
+                        "enum": [
+                          "error/fitting_function",
+                          "euclidean",
+                          "mutual_information",
+                          "correlation",
+                          "jaccard",
+                          "mahalanobis",
+                          "hamming",
+                          "exact_matching",
+                          "manhattan",
+                          "probabilistic",
+                          "vote",
+                          "no"
+                        ]
+                      },
+                      {
+                        "$ref": "#/definitions/other"
+                      },
+                      {
+                        "$ref": "#/definitions/missing"
+                      }
+                    ]
+                  },
+                  "tools": {
+                    "propertyOrder": 70,
+                    "$ref": "#/definitions/tools"
+                  },
+                  "source": {
+                    "title": "source <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/analysis_method.html#source-optional\">help</a>",
+                    "type": "string",
+                    "minLength": 1,
+                    "propertyOrder": 80,
+                    "oneOf": [
+                      {
+                        "title": "default values",
+                        "enum": [
+                          "own_proposed",
+                          "own_referenced",
+                          "referenced"
+                        ]
+                      },
+                      {
+                        "$ref": "#/definitions/other"
+                      },
+                      {
+                        "$ref": "#/definitions/missing"
+                      }
+                    ]
+                  },
+                  "parameters_provided": {
+                    "title": "parameters_provided <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/analysis_method.html#parameters-provided-optional\">help</a>",
+                    "propertyOrder": 90,
+                    "oneOf": [
+                      {
+                        "title": "boolean",
+                        "type": "boolean"
+                      },
+                      {
+                        "title": "partially",
+                        "type": "string",
+                        "enum": [
+                          "partially"
+                        ]
+                      }
                     ]
                   }
+                },
+                "required": [
+                  "name"
                 ]
               }
             },
-            "required": [
-              "name"
-            ]
-          }
+            {
+              "$ref": "#/definitions/none"
+            },
+            {
+              "$ref": "#/definitions/missing"
+            }
+          ]
         }
       },
       "required": [
@@ -1191,108 +1305,126 @@
         },
         "methods": {
           "title": "methods",
-          "type": "array",
           "propertyOrder": 100,
-          "items": {
-            "title": "evaluation_method",
-            "type": "object",
-            "format": "grid",
-            "properties": {
-              "name": {
-                "title": "name <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/evaluation.html#name\">help</a>",
-                "type": "string",
-                "propertyOrder": 10,
-                "minLength": 1
-              },
-              "type": {
-                "title": "type <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/evaluation.html#type-optional\">help</a>",
-                "type": "string",
-                "minLength": 1,
-                "propertyOrder": 20,
-                "oneOf": [
-                  {
-                    "title": "default values",
-                    "enum": [
-                      "external",
-                      "internal",
-                      "external_and_internal",
-                      "nest"
+          "oneOf": [
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "title": "evaluation_method",
+                "type": "object",
+                "format": "grid",
+                "properties": {
+                  "name": {
+                    "title": "name <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/evaluation.html#name\">help</a>",
+                    "type": "string",
+                    "propertyOrder": 10,
+                    "minLength": 1
+                  },
+                  "type": {
+                    "title": "type <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/evaluation.html#type-optional\">help</a>",
+                    "type": "string",
+                    "minLength": 1,
+                    "propertyOrder": 20,
+                    "oneOf": [
+                      {
+                        "title": "default values",
+                        "enum": [
+                          "external",
+                          "internal",
+                          "external_and_internal",
+                          "nest"
+                        ]
+                      },
+                      {
+                        "$ref": "#/definitions/other"
+                      },
+                      {
+                        "$ref": "#/definitions/missing"
+                      }
                     ]
                   },
-                  {
-                    "$ref": "#/definitions/other"
-                  },
-                  {
-                    "$ref": "#/definitions/missing"
-                  }
-                ]
-              },
-              "metrics": {
-                "title": "metrics <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/evaluation.html#metrics-optional\">help</a>",
-                "type": "array",
-                "propertyOrder": 30,
-                "items": {
-                  "title": "metric",
-                  "type": "string",
-                  "minLength": 1,
-                  "oneOf": [
-                    {
-                      "title": "default values",
-                      "enum": [
-                        "error_distance",
-                        "precision",
-                        "accuracy",
-                        "recall",
-                        "f-1",
-                        "roc/uac",
-                        "complete_confusion_matrix",
-                        "incomplete_confusion_matrix",
-                        "classification_loss",
-                        "clustering_metrics",
-                        "time-based",
-                        "computing_resources-based",
-                        "granularity-based",
-                        "heuristic",
-                        "vote"
-                      ]
-                    },
-                    {
-                      "$ref": "#/definitions/other"
-                    },
-                    {
-                      "$ref": "#/definitions/missing"
-                    }
-                  ]
-                }
-              },
-              "source": {
-                "title": "source <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/evaluation.html#source-optional\">help</a>",
-                "type": "string",
-                "propertyOrder": 40,
-                "minLength": 1,
-                "oneOf": [
-                  {
-                    "title": "default values",
-                    "enum": [
-                      "own_proposed",
-                      "own_referenced",
-                      "referenced",
-                      "popular"
+                  "metrics": {
+                    "title": "metrics <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/evaluation.html#metrics-optional\">help</a>",
+                    "propertyOrder": 30,
+                    "oneOf": [
+                      {
+                        "type": "array",
+                        "minItems": 1,
+                        "items": {
+                          "title": "metric",
+                          "type": "string",
+                          "minLength": 1,
+                          "oneOf": [
+                            {
+                              "title": "default values",
+                              "enum": [
+                                "error_distance",
+                                "precision",
+                                "accuracy",
+                                "recall",
+                                "f-1",
+                                "false_negative_rate",
+                                "false_positive_rate",
+                                "roc/auc",
+                                "complete_confusion_matrix",
+                                "incomplete_confusion_matrix",
+                                "classification_loss",
+                                "clustering_metrics",
+                                "time-based",
+                                "computing_resources-based",
+                                "granularity-based",
+                                "heuristic",
+                                "vote"
+                              ]
+                            },
+                            {
+                              "$ref": "#/definitions/other"
+                            }
+                          ]
+                        }
+                      },
+                      {
+                        "$ref": "#/definitions/missing"
+                      }
                     ]
                   },
-                  {
-                    "$ref": "#/definitions/other"
-                  },
-                  {
-                    "$ref": "#/definitions/missing"
+                  "source": {
+                    "title": "source <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/evaluation.html#source-optional\">help</a>",
+                    "type": "string",
+                    "propertyOrder": 40,
+                    "minLength": 1,
+                    "oneOf": [
+                      {
+                        "title": "default values",
+                        "enum": [
+                          "own_proposed",
+                          "own_referenced",
+                          "referenced",
+                          "popular"
+                        ]
+                      },
+                      {
+                        "$ref": "#/definitions/other"
+                      },
+                      {
+                        "$ref": "#/definitions/missing"
+                      }
+                    ]
                   }
+                },
+                "required": [
+                  "name"
                 ]
               }
             },
-            "required": [
-              "name"
-            ]
-          }
+            {
+              "$ref": "#/definitions/none"
+            },
+            {
+              "$ref": "#/definitions/missing"
+            }
+          ]
         }
       },
       "required": [
@@ -1340,6 +1472,7 @@
           "title": "subgoals <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/result.html#subgoals-optional\">help</a>",
           "propertyOrder": 20,
           "type": "array",
+          "minItems": 1,
           "format": "table",
           "items": {
             "$ref": "#/definitions/goal"
@@ -1373,6 +1506,7 @@
         "claimed_improvements": {
           "title": "claimed_improvements <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/result.html#claimed-improvements\">help</a>",
           "type": "array",
+          "minItems": 1,
           "propertyOrder": 40,
           "format": "table",
           "items": {

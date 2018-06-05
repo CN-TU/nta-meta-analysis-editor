@@ -35,6 +35,7 @@
 <value> -> {"mad": [<values>]} # returns the mean absolute deviation of <values>
 <value> -> {"moment": [<values>, <value>]} # returns the <value>-th standardized moment of <values>
 <value> -> {"count": [<selection>]}  # returns number of selected objects
+<value> -> {"length": [<values>]}  # returns number of values (useful to use with quantile_range)
 <value> -> {"distinct": [<values>]}  # returns number of distinct values in <values> in the selected objects
 <value> -> {"apply": [<value>, <selection>]}  # returns a single feature value for the selection of objects
 <value> -> {"add": [<value>, <value>+]} | {"add": [<values>]}
