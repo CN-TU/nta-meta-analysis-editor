@@ -259,8 +259,8 @@
       "title": "version",
       "type": "string",
       "propertyOrder": 1,
-      "default": "v2.2.0",
-      "enum": ["v2.2.0", "v2.1.1", "v2.1"]
+      "default": "v2.3.0",
+      "enum": ["v2.3.0", "v2.2.0", "v2.1.1", "v2.1"]
     },
     "reference": {
       "title": "reference",
@@ -1566,7 +1566,8 @@
       "required": [
         "main_goal",
         "focus_main",
-        "claimed_improvements"
+        "claimed_improvements",
+        "reproducibility"
       ]
     }
   }
