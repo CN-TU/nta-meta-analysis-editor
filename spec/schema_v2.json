@@ -259,8 +259,8 @@
       "title": "version",
       "type": "string",
       "propertyOrder": 1,
-      "default": "v2.3.0",
-      "enum": ["v2.3.0", "v2.2.0", "v2.1.1", "v2.1"]
+      "default": "v3.0.0",
+      "enum": ["v3.0.0"]
     },
     "reference": {
       "title": "reference",
@@ -1072,18 +1072,58 @@
                 "title": "algorithm",
                 "type": "object",
                 "properties": {
-                  "name": {
-                    "title": "name <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/analysis_method.html#id2\">help</a>",
+                  "family": {
+                    "title": "family <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/analysis_method.html#family\">help</a>",
                     "type": "string",
                     "propertyOrder": 10,
-                    "minLength": 1
+                    "minLength": 1,
+                    "oneOf": [
+                      {
+                        "title": "default values",
+                        "enum": [
+                            "autoregressive_models",
+                            "bayesian",
+                            "cluster_validation",
+                            "crossvalidation",
+                            "decision_tree",
+                            "ensemble",
+                            "entropy_based",
+                            "fuzzy_clustering",
+                            "glm_regression",
+                            "graph_modeling",
+                            "hierarchical_clustering",
+                            "kmeans_clustering",
+                            "kmedoids_clustering",
+                            "knn",
+                            "markov_process",
+                            "mixture_model",
+                            "neural_networks",
+                            "parameter_search",
+                            "pca",
+                            "random_forest",
+                            "rule_extraction",
+                            "signature",
+                            "statistics",
+                            "stream_clustering",
+                            "svm",
+                            "two_step_clustering",
+                            "wavelet_transform"
+                        ]
+                      },
+                      {
+                        "$ref": "#/definitions/other"
+                      },
+                      {
+                        "$ref": "#/definitions/missing"
+                      }
+                    ]
                   },
-                  "subname": {
-                    "title": "subname <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/analysis_method.html#subname-optional\">help</a>",
+                  "detail": {
+                    "title": "detail <a href=\"https://nta-meta-analysis.readthedocs.io/en/latest/analysis_method.html#detail-optional\">help</a>",
                     "propertyOrder": 20,
                     "anyOf": [
                       {
-                        "title": "subname",
+                        "title": "detail",
                         "type": "string",
                         "minLength": 1
                       },
@@ -1133,10 +1173,11 @@
                           "classification",
                           "regression",
                           "clustering",
-                          "heuristics",
-                          "anomaly_detection",
-                          "statistics",
-                          "text_matching"
+                          "modeling",
+                          "outlier_detection",
+                          "space_transformation",
+                          "specific_detection",
+                          "validation_optimization"
                         ]
                       },
                       {
@@ -1223,7 +1264,7 @@
                   }
                 },
                 "required": [
-                  "name"
+                  "family"
                 ]
               }
             },
@@ -1453,11 +1494,9 @@
             {
               "title": "default values",
               "enum": [
-                "anomaly_detection",
-                "traffic_classification",
-                "botnet_detection",
-                "specific_malware_detection",
-                "network_properties_monitoring"
+                  "detect_anomalies",
+                  "detect_attacks",
+                  "classify_traffic"
               ]
             },
             {
