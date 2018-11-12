@@ -291,11 +291,13 @@ class MainWindow extends Component {
     }
 
     saved = () => {
-        this.saveButton.current.setState({ saved: true }, () => {
-            window.setTimeout(() => {
-                this.saveButton.current.setState({ saved: false })
-            }, 1000);
-        })
+        if (this.saveButton.current !== null) {
+            this.saveButton.current.setState({ saved: true }, () => {
+                window.setTimeout(() => {
+                    this.saveButton.current.setState({ saved: false })
+                }, 1000);
+            })
+        }
     }
 
     fileNew = () => {
@@ -380,7 +382,9 @@ class MainWindow extends Component {
     }
 
     onEdit = () => {
-        this.saveButton.current.setState({ changed: true });
+        if (this.saveButton.current !== null) {
+            this.saveButton.current.setState({ changed: true });
+        }
         clearTimeout(this.validateTimeout);
         this.validateTimeout = setTimeout(() => {
             this.validateTimeout = null;
