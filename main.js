@@ -1,4 +1,9 @@
 const { app, BrowserWindow, ipcMain, dialog, net, webContents } = require('electron')
+
+// fix bug with transparency and drag+drop
+if (process.platform === "linux")
+    app.disableHardwareAcceleration()
+
 const path = require('path')
 const url = require('url')
 const https = require('https')
